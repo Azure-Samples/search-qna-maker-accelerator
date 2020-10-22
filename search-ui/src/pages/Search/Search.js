@@ -56,7 +56,7 @@ export default function Search() {
   // allows the back button to work as expected when coming back from the details page
   useEffect(() => {
     history.push('/search?q=' + q);
-
+    setCurrentPage(1);
     const body = {
       q: q
     };

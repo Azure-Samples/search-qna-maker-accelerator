@@ -23,7 +23,7 @@ export default function Results(props) {
 
   //console.log(props.documents);
   var answer;
-  if(props.answer.answer) {
+  if(props.answer.answer && beginDocNumber === 1) {
     answer = <Answer data={props.answer}></Answer>;
   } else {
     answer = null;

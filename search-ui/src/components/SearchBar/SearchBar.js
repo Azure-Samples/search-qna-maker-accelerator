@@ -15,6 +15,12 @@ export default function SearchBar(props) {
         setShowSuggestions(false);
     }
 
+    const onEnterButton = (event) => {
+        if (event.keyCode === 13) {
+            onSearchHandler()
+        }
+    }
+
     const suggestionClickHandler = (s) => {
         document.getElementById("search-box").value = s;
         setShowSuggestions(false);
@@ -64,7 +70,7 @@ export default function SearchBar(props) {
 
     return (
         <div >
-            <div className="input-group" >
+            <div className="input-group" onKeyDown={e => onEnterButton(e)}>
                 <div className="suggestions" >
                     <input 
                         autoComplete="off" // setting for browsers; not the app
