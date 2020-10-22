@@ -1,10 +1,13 @@
-.result {
-    padding: 8px;
-    padding-left: 8px;
+.answer {
+
+    padding: 16px;
     text-align: left;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
     margin: 10px;
     margin-bottom: 3px;
-    padding-bottom: 0px;
+    padding-bottom: 3px;
+    box-sizing: border-box;
     /* cursor: pointer; */
 }
 /* 
