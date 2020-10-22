@@ -1,0 +1,14 @@
+.logo {
+    margin-left: 2em;
+    height: 60px;
+}
+
+.header {
+    background-color: #0078d7;
+    color: #eee;
+}
+.nav-link { color: #fff; }
+.nav-link:hover { color: #eee; }
+
+.auth-link { color: #fff; }
+.auth-link:hover { color: #eee; }

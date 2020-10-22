@@ -1,0 +1,33 @@
+.answer {
+
+    padding: 16px;
+    text-align: left;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
+    margin: 10px;
+    margin-bottom: 3px;
+    padding-bottom: 3px;
+    box-sizing: border-box;
+    overflow: hidden;
+    /* cursor: pointer; */
+}
+/* 
+.result:hover,
+.result:active {
+    background-color: #C0DDF5;
+} */
+
+.result-item {
+    margin-bottom: 2em;
+    text-align:left;
+}
+
+.title-style {
+    vertical-align: left;
+}
+
+em {
+    font-weight: bold;
+    font-style: normal;
+}
+

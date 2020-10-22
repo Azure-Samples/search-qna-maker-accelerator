@@ -1,0 +1,29 @@
+.result {
+    padding: 8px;
+    padding-left: 8px;
+    text-align: left;
+    margin: 10px;
+    margin-bottom: 3px;
+    padding-bottom: 0px;
+    /* cursor: pointer; */
+}
+/* 
+.result:hover,
+.result:active {
+    background-color: #C0DDF5;
+} */
+
+.result-item {
+    margin-bottom: 2em;
+    text-align:left;
+}
+
+.title-style {
+    vertical-align: left;
+}
+
+em {
+    font-weight: bold;
+    font-style: normal;
+}
+
