@@ -2,8 +2,6 @@
 
 This sample is a React template for [Azure Cognitive Search](https://docs.microsoft.com/en-us/azure/search/search-what-is-azure-search). It leverages the [Azure SDK for Javascript/Typescript](https://github.com/Azure/azure-sdk-for-js/tree/master/sdk/search/search-documents/) and [Azure Static Web Apps](https://aka.ms/swadocs) to make it easy to get up and running with a simple web application.
 
-You can view the resulting web application here: [https://victorious-beach-0ab88b51e.azurestaticapps.net/](https://victorious-beach-0ab88b51e.azurestaticapps.net/)
-
 ![Screenshot of sample web app](./images/web-app.png)
 
 You can easily deploy the sample onto Azure or run it locally by following the steps below.
@@ -26,9 +24,7 @@ To run the sample locally, follow the steps below.
 
 1. Rename the `api/local.settings.json.rename` file to `api/local.settings.json`.
 
-The `local.settings.json` file holds all of the keys that the application needs.
-
-For this sample, there is a search index using the [goodbooks-10k dataset](https://github.com/zygmuntz/goodbooks-10k) that that is publicly available using the connection information below. The index consists of 10,000 popular books that we'll search over in our application.
+The `local.settings.json` file holds all of the keys that the application needs and should include the following json:
 
 ```json
 {
@@ -37,9 +33,13 @@ For this sample, there is a search index using the [goodbooks-10k dataset](https
     "AzureWebJobsStorage": "",
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "SearchApiKey": "",
-    "SearchServiceName": "azs-playground",
-    "SearchIndexName": "good-books",
-    "SearchFacets": "authors*,language_code"
+    "SearchServiceName": "",
+    "SearchIndexName": "",
+    "SearchFacets": "",
+
+    "QnAMakerEndpoint": "",
+    "QnAMakerKey": "",
+    "QnAMakerKnowledgeBaseId": ""
   }
 }
 ```
@@ -68,7 +68,6 @@ This project can be run anywhere, but VS Code is required for local debugging.
 
 1. From VS Code, press <kbd>F5</kbd>
 
-
 ## Deploying this sample
 
 ### Prerequisites
@@ -78,9 +77,7 @@ This project can be run anywhere, but VS Code is required for local debugging.
 
 ### Forking the repo
 
-To start off, select **Use this template** above. This will create your own copy of the code that you can deploy and edit as you please.
-
-![Use this template screenshot](./images/use-template.png)
+To start off, fork the repo so that you have your own copy.
 
 ### Creating the web app
 
