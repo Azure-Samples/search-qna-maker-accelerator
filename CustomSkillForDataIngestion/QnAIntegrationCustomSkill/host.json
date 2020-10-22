@@ -1,0 +1,10 @@
+{
+  "version": "2.0",
+  "functionTimeout": "00:10:00",
+  "extensions": {
+    "queues": {
+      "batchSize": 1,
+      "maxDequeueCount": 1
+    }
+  }
+}
