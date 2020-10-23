@@ -1,0 +1,413 @@
+{
+	"info": {
+		"_postman_id": "df783355-d931-4cf8-845f-bedd1d893de9",
+		"name": "QnA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Datasource",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "api-key",
+						"value": "{{search-service-admin-key}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{datasource-name}}\",\r\n    \"description\": \"QnA docs\",\r\n    \"type\": \"azureblob\",\r\n    \"credentials\": {\r\n        \"connectionString\": \"{{storage-connection-string}}\"\r\n    },\r\n    \"container\": {\r\n        \"name\": \"{{storage-container-name}}\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{search-service-name}}.search.windows.net/datasources/{{datasource-name}}?api-version={{api-version}}",
+					"protocol": "https",
+					"host": [
+						"{{search-service-name}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"datasources",
+						"{{datasource-name}}"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "{{api-version}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Index",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "api-key",
+						"value": "{{search-service-admin-key}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{index-name}}\",\r\n    \"fields\": [\r\n        {\r\n            \"name\": \"content\",\r\n            \"type\": \"Edm.String\",\r\n            \"sortable\": false,\r\n            \"searchable\": true,\r\n            \"filterable\": false,\r\n            \"facetable\": false\r\n        },\r\n        {\r\n            \"name\": \"metadata_storage_path\",\r\n            \"type\": \"Edm.String\",\r\n            \"searchable\": true,\r\n            \"sortable\": false,\r\n            \"filterable\": false,\r\n            \"facetable\": false\r\n        },\r\n        {\r\n            \"name\": \"id\",\r\n            \"type\": \"Edm.String\",\r\n            \"key\": true,\r\n            \"searchable\": true,\r\n            \"sortable\": false,\r\n            \"filterable\": false,\r\n            \"facetable\": false\r\n        },\r\n        {\r\n            \"name\": \"metadata_storage_name\",\r\n            \"type\": \"Edm.String\",\r\n            \"searchable\": true,\r\n            \"sortable\": false,\r\n            \"filterable\": false,\r\n            \"facetable\": false\r\n        },\r\n        {\r\n            \"name\": \"status\",\r\n            \"type\": \"Edm.String\",\r\n            \"sortable\": false,\r\n            \"searchable\": false,\r\n            \"filterable\": false,\r\n            \"facetable\": false\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{search-service-name}}.search.windows.net/indexes/{{index-name}}?api-version={{api-version}}",
+					"protocol": "https",
+					"host": [
+						"{{search-service-name}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"indexes",
+						"{{index-name}}"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "{{api-version}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Skillset",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "api-key",
+						"value": "{{search-service-admin-key}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{skillset-name}}\",\r\n    \"description\": \"Skillset\",\r\n    \"skills\": [\r\n        {\r\n            \"@odata.type\": \"#Microsoft.Skills.Custom.WebApiSkill\",\r\n            \"name\": \"UploadToQnA\",\r\n            \"description\": \"Upload the documents to the QnA knowledge base\",\r\n            \"uri\": \"https://{{function-name}}.azurewebsites.net/api/upload-to-qna?code={{function-code}}\",\r\n            \"httpMethod\": \"POST\",\r\n            \"context\": \"/document\",\r\n            \"batchSize\": 10,\r\n            \"timeout\": \"PT230S\",\r\n            \"degreeOfParallelism\": 1,\r\n            \"inputs\": [\r\n                {\r\n                    \"name\": \"id\",\r\n                    \"source\": \"/document/id\"\r\n                },\r\n                {\r\n                    \"name\": \"blobName\",\r\n                    \"source\": \"/document/metadata_storage_name\"\r\n                },\r\n                {\r\n                    \"name\": \"blobUrl\",\r\n                    \"source\": \"/document/metadata_storage_path\"\r\n                },\r\n                {\r\n                    \"name\": \"sasToken\",\r\n                    \"source\": \"/document/metadata_storage_sas_token\"\r\n                }\r\n            ],\r\n            \"outputs\": [\r\n                {\r\n                    \"name\": \"status\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"cognitiveServices\": {\r\n        \"@odata.type\": \"#Microsoft.Azure.Search.CognitiveServicesByKey\",\r\n        \"description\": \"CognitiveServices AllInOne account\",\r\n        \"key\": \"{{cog-svc-allinone-key}}\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{search-service-name}}.search.windows.net/skillsets/{{skillset-name}}?api-version={{api-version}}",
+					"protocol": "https",
+					"host": [
+						"{{search-service-name}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"skillsets",
+						"{{skillset-name}}"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "{{api-version}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Indexer",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "api-key",
+						"value": "{{search-service-admin-key}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"{{indexer-name}}\",\n    \"targetIndexName\": \"{{index-name}}\",\n    \"dataSourceName\": \"{{datasource-name}}\",\n    \"skillsetName\": \"{{skillset-name}}\",\n    \"disabled\": false,\n    \"parameters\": {\n        \"batchSize\": 10,\n        \"maxFailedItems\": -1,\n        \"maxFailedItemsPerBatch\": -1,\n        \"configuration\": {\n            \"indexedFileNameExtensions\": \".pdf,.docx,.doc,.xlsx,.xls,.html,.rtf,.txt,.tsv\"\n        }\n    },\n    \"fieldMappings\" : [\n        {\n            \"sourceFieldName\": \"metadata_storage_path\",\n            \"targetFieldName\": \"metadata_storage_path\"\n        },\n        {\n            \"sourceFieldName\" : \"metadata_storage_path\",\n            \"targetFieldName\" : \"id\",\n            \"mappingFunction\" : { \"name\" : \"base64Encode\" }\n        },\n        {\n        \t\"sourceFieldName\": \"metadata_storage_name\",\n        \t\"targetFieldName\": \"metadata_storage_name\"\n        }\n   ],\n    \"outputFieldMappings\": [\n        {\n            \"sourceFieldName\": \"/document/content\",\n            \"targetFieldName\": \"content\"\n        },\n        {\n            \"sourceFieldName\": \"/document/status\",\n            \"targetFieldName\": \"status\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{search-service-name}}.search.windows.net/indexers/{{indexer-name}}?api-version={{api-version}}",
+					"protocol": "https",
+					"host": [
+						"{{search-service-name}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"indexers",
+						"{{indexer-name}}"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "{{api-version}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Indexer Status",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "api-key",
+						"value": "{{search-service-admin-key}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{search-service-name}}.search.windows.net/indexers/{{indexer-name}}/status?api-version={{api-version}}",
+					"protocol": "https",
+					"host": [
+						"{{search-service-name}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"indexers",
+						"{{indexer-name}}",
+						"status"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "{{api-version}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Run Indexer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "api-key",
+						"value": "{{search-service-admin-key}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{search-service-name}}.search.windows.net/indexers/{{indexer-name}}/run?api-version={{api-version}}",
+					"protocol": "https",
+					"host": [
+						"{{search-service-name}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"indexers",
+						"{{indexer-name}}",
+						"run"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "{{api-version}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reset Indexer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "api-key",
+						"value": "{{search-service-admin-key}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{search-service-name}}.search.windows.net/indexers/{{indexer-name}}/reset?api-version={{api-version}}",
+					"protocol": "https",
+					"host": [
+						"{{search-service-name}}",
+						"search",
+						"windows",
+						"net"
+					],
+					"path": [
+						"indexers",
+						"{{indexer-name}}",
+						"reset"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "{{api-version}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "1f0790a2-405d-4d6c-ab9a-a55859743da9",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "532263c9-c4f3-40c0-9a54-6afd7d7cda1d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "02897192-9468-4979-bdb1-01113e6a085f",
+			"key": "search-service-name",
+			"value": "<SEARCH_SERVICE_NAME>"
+		},
+		{
+			"id": "37827104-e7bc-4097-85d1-0c59e5ed5827",
+			"key": "search-service-admin-key",
+			"value": "<SEARCH_SERVICE_ADMIN_KEY>"
+		},
+		{
+			"id": "b41230b5-5043-4e6f-8082-cd1c886a6a49",
+			"key": "cog-svc-allinone-key",
+			"value": "<COGNITIVE_SERVICES_ALLINONE_KEY>"
+		},
+		{
+			"id": "50feac6b-a1c2-4117-acf4-ccb8e43c15c9",
+			"key": "storage-connection-string",
+			"value": "<STORAGE_ACCOUNT_CONNECTION_STRING>"
+		},
+		{
+			"id": "be003305-f66f-4bca-940f-24d5572e6066",
+			"key": "function-name",
+			"value": "<FUNCTION_NAME>"
+		},
+		{
+			"id": "a02d96c0-aa01-4b7c-acf0-45b909b1f421",
+			"key": "function-code",
+			"value": "<FUNCTION_HOST_CODE>"
+		},
+		{
+			"id": "340f65f9-8c6c-4e83-8920-f4f0a8080a92",
+			"key": "storage-container-name",
+			"value": "<STORAGE_CONTAINER_NAME>"
+		},
+		{
+			"id": "8d8bed60-2b71-4f85-a4a0-5a21f3742295",
+			"key": "api-version",
+			"value": "2020-06-30"
+		},
+		{
+			"id": "a02dd739-9ba9-4275-a886-ce0f5d2122ac",
+			"key": "datasource-name",
+			"value": "qna-ds"
+		},
+		{
+			"id": "1139a2da-603f-4e8d-92f6-01981560f6d7",
+			"key": "index-name",
+			"value": "qna-idx"
+		},
+		{
+			"id": "836a80ec-c9c6-4769-8bd7-3faee59a6346",
+			"key": "skillset-name",
+			"value": "qna-ss"
+		},
+		{
+			"id": "b45b50af-ea3f-439e-8279-f73861426b55",
+			"key": "indexer-name",
+			"value": "qna-ixr"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
