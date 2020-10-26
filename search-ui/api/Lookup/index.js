@@ -1,8 +1,17 @@
 const { SearchClient, AzureKeyCredential } = require("@azure/search-documents");
+const { BlobServiceClient} = require("@azure/storage-blob");
 
 const indexName = process.env["SearchIndexName"];
 const apiKey = process.env["SearchApiKey"];
 const searchServiceName = process.env["SearchServiceName"];
+
+const storageAcountName = process.env["StorageAcountName"];
+const storageAcountKey = process.env["StorageAcountKey"];
+const storageContainerName = process.env["StorageContainerName"];
+
+// Create a blob client to get a sas token for the document
+const blobConnectionString = `DefaultEndpointsProtocol=https;AccountName=${storageAcountName};AccountKey=${storageAcountKey};EndpointSuffix=core.windows.net`;
+const blobServiceClient = BlobServiceClient.fromConnectionString(blobConnectionString);
 
 // Create a SearchClient to send queries
 const client = new SearchClient(
@@ -10,6 +19,14 @@ const client = new SearchClient(
     indexName,
     new AzureKeyCredential(apiKey)
 );
+
+const getSasToken = (blobName) => {
+    const container = blobServiceClient.getContainerClient(storageContainerName);
+    const blob = container.getBlobClient(blobName);
+    const sasToken = blob.getSasToken();
+
+    return sasToken;
+}
 
 module.exports = async function (context, req) {
     

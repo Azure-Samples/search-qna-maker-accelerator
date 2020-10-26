@@ -12,6 +12,7 @@ import AppHeader from '../components/AppHeader/AppHeader';
 import Home from '../pages/Home/Home';
 import Search from '../pages/Search/Search';
 import Details from '../pages/Details/Details';
+import Upload from '../pages/Upload/Upload';
 
 // Bootstrap styles, optionally with jQuery and Popper
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -22,6 +23,7 @@ import './App.css';
 export default function App() {
   // React Hook: useState with a var name, set function, & default value
   const [user, setUser] = useState({});
+  const [knowledgeBaseId, setKnowledgeBaseId] = useState({});
 
   // Fetch authentication API & set user state
   async function fetchAuth() {
@@ -36,20 +38,35 @@ export default function App() {
     }
   }
 
+  // Fetch knowledge base id to construct link in nav bar
+  async function fecthKnowledgeBaseId() {
+    const response = await fetch("/api/getKb");
+    if (response) {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        response.json()
+          .then(response => setKnowledgeBaseId(response.QnAMakerKnowledgeBaseId))
+          .catch(error => console.error('Error:', error));
+      }
+    }
+  }
+
   // React Hook: useEffect when component changes
   // Empty array ensure this only runs once on mount
   useEffect(() => {
-    fetchAuth()
+    fetchAuth();
+    fecthKnowledgeBaseId();
   }, []);
 
   return (
     <AuthContext.Provider value={user}>
       <div className="container-fluid app">
-        <AppHeader />
+        <AppHeader kbId={knowledgeBaseId} />
         <Router>
           <Switch>
             <Route path="/" exact component={Home} />
             <Route path="/search" component={Search} />
+            <Route path="/upload" component={Upload} />
             <Route path="/details/:id" component={Details} />
           </Switch>
         </Router>

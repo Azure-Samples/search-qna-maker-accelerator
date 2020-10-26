@@ -8,7 +8,9 @@ const iconStyle = {
   height: "auto"
 }
 
-export default function AppHeader() {
+export default function AppHeader(props) {
+  const kbUrl = `https://www.qnamaker.ai/Edit/KnowledgeBase?kbId=${props.kbId}`;
+
   return (
     <header className="header">
       <nav className="navbar navbar-expand-lg">
@@ -25,7 +27,10 @@ export default function AppHeader() {
               <a className="nav-link" href="/Search">Search</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="https://azure.microsoft.com/services/search/">Learn more</a>
+              <a className="nav-link" href="/Upload">Documents</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href={kbUrl}>Knowledge Base</a>
             </li>
           </ul>
         </div>

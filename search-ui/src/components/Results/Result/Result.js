@@ -37,12 +37,12 @@ export default function Result(props) {
 
     return (
         <div className="result row" style={cardStyle}>
-            <a href={`/details/${props.document.metadata_storage_path}`}>
+            <a href={`/details/${props.document.id}`}>
                 <div style={bodyStyle}>
                     <h6 className="title-style">{props.document.metadata_storage_name}</h6>
                 </div>
             </a>
-            <p style={uriStyle}>{props.document.fileUri}</p>
+            <p style={uriStyle}>{props.document.metadata_storage_path}</p>
             <p style={pStyle}>
                 {ReactHtmlParser(props?.highlights?.content[0] || "")}
             </p>
