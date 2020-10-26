@@ -9,6 +9,7 @@ export default function Upload() {
       <div>
         <h1>Upload a document</h1>
       </div>
+      <button></button>
     </main>
   );
 };
