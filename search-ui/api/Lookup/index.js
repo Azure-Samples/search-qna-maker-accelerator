@@ -5,7 +5,7 @@ const indexName = process.env["SearchIndexName"];
 const apiKey = process.env["SearchApiKey"];
 const searchServiceName = process.env["SearchServiceName"];
 
-const storageAcountName = process.env["StorageAcountName"];
+const storageAcountName = process.env["StorageAccountName"];
 const storageAcountKey = process.env["StorageAcountKey"];
 const storageContainerName = process.env["StorageContainerName"];
 

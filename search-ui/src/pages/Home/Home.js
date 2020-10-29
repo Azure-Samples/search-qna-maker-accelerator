@@ -18,7 +18,7 @@ export default function Home() {
   return (
     <main className="main main--home">
       <div className="row home-search">
-        <img className="logo" src="/images/search-and-qna.png" alt="Cognitive Search"></img>
+        <img className="logo" src="/images/search-and-qna.png" alt="Cognitive Search and QnA Maker"></img>
         <p className="poweredby lead">Powered by Azure Cognitive Search and QnA Maker</p>
         <SearchBar postSearchHandler={navigateToSearchPage}></SearchBar>
       </div>

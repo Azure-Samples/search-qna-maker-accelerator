@@ -1,4 +1,4 @@
-const qnAMakerKnowledgeBaseId = process.env["QnAMakerKnowledgeBaseId"];
+const qnAMakerKnowledgeBaseID = process.env["QnAMakerKnowledgeBaseID"];
 
 module.exports = async function (context, req) {
     
@@ -8,7 +8,7 @@ module.exports = async function (context, req) {
         headers: {
             "Content-type": "application/json"
         },
-        body: { QnAMakerKnowledgeBaseId: qnAMakerKnowledgeBaseId}
+        body: { QnAMakerKnowledgeBaseID: qnAMakerKnowledgeBaseID}
     };
     
 };

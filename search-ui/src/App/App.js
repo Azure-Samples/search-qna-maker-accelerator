@@ -23,7 +23,7 @@ import './App.css';
 export default function App() {
   // React Hook: useState with a var name, set function, & default value
   const [user, setUser] = useState({});
-  const [knowledgeBaseId, setKnowledgeBaseId] = useState({});
+  const [knowledgeBaseID, setKnowledgeBaseID] = useState({});
 
   // Fetch authentication API & set user state
   async function fetchAuth() {
@@ -39,13 +39,13 @@ export default function App() {
   }
 
   // Fetch knowledge base id to construct link in nav bar
-  async function fecthKnowledgeBaseId() {
+  async function fecthKnowledgeBaseID() {
     const response = await fetch("/api/getKb");
     if (response) {
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.indexOf("application/json") !== -1) {
         response.json()
-          .then(response => setKnowledgeBaseId(response.QnAMakerKnowledgeBaseId))
+          .then(response => setKnowledgeBaseID(response.QnAMakerKnowledgeBaseID))
           .catch(error => console.error('Error:', error));
       }
     }
@@ -55,13 +55,13 @@ export default function App() {
   // Empty array ensure this only runs once on mount
   useEffect(() => {
     fetchAuth();
-    fecthKnowledgeBaseId();
+    fecthKnowledgeBaseID();
   }, []);
 
   return (
     <AuthContext.Provider value={user}>
       <div className="container-fluid app">
-        <AppHeader kbId={knowledgeBaseId} />
+        <AppHeader kbId={knowledgeBaseID} />
         <Router>
           <Switch>
             <Route path="/" exact component={Home} />

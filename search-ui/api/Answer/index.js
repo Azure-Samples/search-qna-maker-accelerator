@@ -3,7 +3,7 @@ const { CognitiveServicesCredentials } =  require("@azure/ms-rest-azure-js");
 
 const qnaMakerKey = process.env["QnAMakerKey"];
 const endpoint = process.env["QnAMakerEndpoint"];
-const kbId = process.env["QnAMakerKnowledgeBaseId"];
+const kbId = process.env["QnAMakerKnowledgeBaseID"];
 const customHeaders = { Authorization: `EndpointKey ${qnaMakerKey}` };
 
 // Create a QnAMakerClient
