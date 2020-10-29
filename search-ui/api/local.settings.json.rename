@@ -10,6 +10,10 @@
 
     "QnAMakerEndpoint": "",
     "QnAMakerKey": "",
-    "QnAMakerKnowledgeBaseId": ""
+    "QnAMakerKnowledgeBaseID": "",
+
+    "StorageAccountName": "",
+    "StorageAccountKey": "",
+    "StorageContainerName": ""
   }
 }

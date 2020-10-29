@@ -47,18 +47,18 @@ export default function SearchBar(props) {
             suggester: 'sg'
         };
 
-        // if (q === '') {
-        //     setSuggestions([]);
-        // } else {
-        //     axios.post( '/api/suggest', body)
-        //     .then( response => {
-        //         setSuggestions(response.data.suggestions);
-        //     } )
-        //     .catch(error => {
-        //         console.log(error);
-        //         setSuggestions([]);
-        //     });
-        // }
+        if (q === '') {
+            setSuggestions([]);
+        } else {
+            axios.post( '/api/suggest', body)
+            .then( response => {
+                setSuggestions(response.data.suggestions);
+            } )
+            .catch(error => {
+                console.log(error);
+                setSuggestions([]);
+            });
+        }
     }, [q, props]);
 
     var suggestionDiv;

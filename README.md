@@ -12,12 +12,25 @@ This solution accelerator contains the following artifacts:
 
 ## Deploy
 
-[![Deploy to Azure](https://azuredeploy.net/deploybutton.svg)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fjennifermarsman%2Fcognitive-search-qna-solution%2Fmain%2Fazuredeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fjennifermarsman%2Fcognitive-search-qna-solution%2Fmain%2Fazuredeploy.json)
 
 ## How to use
 
 1. Deploy the ARM template using the button above.
 1. Download [the Postman collection](./QnA.postman_collection.json) and import it into Postman.
+
+    The Postman collection requires the following parameters:
+    + search-service-name
+    + data-source-name
+    + api-version
+    + index-name
+    + skillset-name
+    + indexer-name
+    + storage-connection-string
+    + storage-container-name
+    + cog-svc-allinone-key
+    + function-name
+    + function-code
 1. When the deployment finishes, go to the "Outputs" and copy and paste the outputs into the corresponding variables for the Postman collection.
 1. Create a new blob container with name that you specified in the Postman variables in the deployed storage account, and copy your data files into it.
 1. Create a knowledge base in your newly deployed QnAMaker instance at [https://www.qnamaker.ai/](https://www.qnamaker.ai/). Don't add any data to it or publish it yet.

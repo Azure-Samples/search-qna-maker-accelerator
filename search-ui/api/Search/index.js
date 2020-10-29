@@ -73,7 +73,8 @@ module.exports = async function (context, req) {
             includeTotalCount: true,
             facets: Object.keys(facets),
             filter: createFilterExpression(filters, facets),
-            highlightFields: "content"
+            highlightFields: "content",
+            searchMode: "all"
         };
 
         // Sending the search request

@@ -23,7 +23,7 @@ export default function Results(props) {
 
   //console.log(props.documents);
   var answer;
-  if(props.answer.answer && beginDocNumber === 1) {
+  if(props.answer.answer && beginDocNumber === 1 && props.answer.answer !== "No good match found in KB.") {
     answer = <Answer data={props.answer}></Answer>;
   } else {
     answer = null;

@@ -233,6 +233,10 @@
                         {
                             "name": "QnAAuthoringKey",
                             "value": "[listkeys(resourceId('Microsoft.CognitiveServices/accounts', variables('qnaServiceName')), '2017-04-18').key1]"
+                        },
+                        {
+                            "name": "KnowledgeBaseID",
+                            "value": ""
                         }
                     ]
                 }
