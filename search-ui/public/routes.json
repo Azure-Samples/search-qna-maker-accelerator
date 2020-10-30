@@ -33,6 +33,9 @@
         "route": "/search" 
       },
       { 
+        "route": "/upload" 
+      },
+      { 
         "route": "/api/search" 
       },
       { 
@@ -40,6 +43,15 @@
       },
       { 
         "route": "/api/suggest" 
+      },
+      { 
+        "route": "/api/upload" 
+      },
+      { 
+        "route": "/api/getKb" 
+      },
+      { 
+        "route": "/api/answer" 
       },
       { 
         "route": "/details/*" 

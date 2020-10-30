@@ -5,12 +5,12 @@ const indexName = process.env["SearchIndexName"];
 const apiKey = process.env["SearchApiKey"];
 const searchServiceName = process.env["SearchServiceName"];
 
-const storageAcountName = process.env["StorageAccountName"];
-const storageAcountKey = process.env["StorageAcountKey"];
+const storageAccountName = process.env["StorageAccountName"];
+const storageAccountKey = process.env["StorageAccountKey"];
 const storageContainerName = process.env["StorageContainerName"];
 
 // Create a blob client to get a sas token for the document
-const blobConnectionString = `DefaultEndpointsProtocol=https;AccountName=${storageAcountName};AccountKey=${storageAcountKey};EndpointSuffix=core.windows.net`;
+const blobConnectionString = `DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${storageAccountKey};EndpointSuffix=core.windows.net`;
 const blobServiceClient = BlobServiceClient.fromConnectionString(blobConnectionString);
 
 // Create a SearchClient to send queries

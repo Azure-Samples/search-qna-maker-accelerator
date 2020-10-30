@@ -39,7 +39,7 @@ export default function App() {
   }
 
   // Fetch knowledge base id to construct link in nav bar
-  async function fecthKnowledgeBaseID() {
+  async function fetchKnowledgeBaseID() {
     const response = await fetch("/api/getKb");
     if (response) {
       const contentType = response.headers.get("content-type");
@@ -55,7 +55,7 @@ export default function App() {
   // Empty array ensure this only runs once on mount
   useEffect(() => {
     fetchAuth();
-    fecthKnowledgeBaseID();
+    fetchKnowledgeBaseID();
   }, []);
 
   return (
