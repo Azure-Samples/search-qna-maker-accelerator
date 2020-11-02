@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Transcript from '../../components/Transcript/Transcript';
+import DocumentViewer from '../../components/DocumentViewer/DocumentViewer';
 
 import axios from 'axios';
 
@@ -11,6 +12,7 @@ export default function Details() {
 
   let { id } = useParams();
   const [document, setDocument] = useState({});
+  const [sasToken, setSasToken] = useState("");
   const [selectedTab, setTab] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,7 +22,9 @@ export default function Details() {
     axios.get('/api/lookup?id=' + id)
       .then(response => {
         const doc = response.data.document;
+        const sas = response.data.sasToken;
         setDocument(doc);
+        setSasToken(sas);
         setIsLoading(false);
       })
       .catch(error => {
@@ -34,13 +38,13 @@ export default function Details() {
   if (isLoading) {
     body = (<CircularProgress />);
   } else {
-    body = (<div className="card-body"></div>)
+    body = (<DocumentViewer document={document} sasToken={sasToken}></DocumentViewer>)
   }
 
   if (selectedTab === 0) {
     return (
       <div className="main main--details container fluid">
-        <div className="card text-center result-container">
+        <div className="text-center result-container">
           <div className="card-header">
             <ul className="nav nav-tabs card-header-tabs">
               <li className="nav-item">

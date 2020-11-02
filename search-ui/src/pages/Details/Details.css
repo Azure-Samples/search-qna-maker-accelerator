@@ -6,3 +6,10 @@
     width: 10em;
     height: auto;
 }
+
+.result-container {
+    height: 100%;
+    min-height: 40em;
+    margin: 10px;
+    border: 1px solid #ccc;
+}

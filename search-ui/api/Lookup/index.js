@@ -16,16 +16,18 @@ const client = new SearchClient(
     new AzureKeyCredential(apiKey)
 );
 
-const generateSasToken = (accountKey, accountName, container, permissions) => {
-    const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey.toString('base64'));
+const generateSasToken = (accountName, accountKey, container, blob, permissions) => {
+    const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
 
     var expiryDate = new Date();
     expiryDate.setHours(expiryDate.getHours() + 2);
 
     const sasKey = generateBlobSASQueryParameters({
         containerName: container,
+        blobName: blob,
         permissions: ContainerSASPermissions.parse(permissions),
         expiresOn: expiryDate,
+        startsOn: new Date()
     }, sharedKeyCredential);
 
     return sasKey.toString();
@@ -42,7 +44,7 @@ module.exports = async function (context, req) {
     const document = await client.getDocument(id)
 
     const permissions = 'r';
-    const sasToken = generateSasToken(storageAccountName, storageAccountKey, storageContainerName, permissions);
+    const sasToken = generateSasToken(storageAccountName, storageAccountKey, storageContainerName, document.metadata_storage_name, permissions);
 
     //context.log(document);
     context.log(sasToken);
