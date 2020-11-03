@@ -7,7 +7,8 @@
 }
 
 .listitem {
-    padding-left: 36px !important;
+    padding-left: 1em !important;
+    padding-right: 1em !important;
 }
 
 .filterlist {

@@ -1,5 +1,6 @@
 .main--details {
     padding-top: 1em;
+    width: 100%;
 };
 
 .image {
@@ -12,4 +13,8 @@
     min-height: 40em;
     margin: 10px;
     border: 1px solid #ccc;
+}
+
+#tags-panel {
+    margin-top: 1em;
 }

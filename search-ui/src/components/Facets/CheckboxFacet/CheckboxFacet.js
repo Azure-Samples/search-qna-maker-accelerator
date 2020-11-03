@@ -9,6 +9,7 @@ export default function CheckboxFacet(props) {
 
     let [isExpanded, setIsExpanded] = useState(false);
 
+
     const checkboxes = props.values.map(facetValue => {
 
         let isSelected = props.selectedFacets.some(facet => facet.value === facetValue.value);
@@ -59,5 +60,5 @@ const FacetValueListItem= styled(ListItem)({
 const FacetValuesList= styled(List)({
     maxHeight: 340,
     overflowY: 'auto !important',
-    marginRight: '18px !important'
+    marginRight: '18px !important',
 })
