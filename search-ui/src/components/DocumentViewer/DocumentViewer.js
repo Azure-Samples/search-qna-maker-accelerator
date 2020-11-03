@@ -17,7 +17,7 @@ export default function DocumentViewer(props) {
         if (pathLower.includes(".pdf")) {
               fileContainerHTML =
                 <object className="file-container" data={path} type="application/pdf" width="100%" height="100%">
-                    <iframe className="file-container" src={path} type="application/pdf" width="100%" height="100%">
+                    <iframe title="file-viewer" className="file-container" src={path} type="application/pdf" width="100%" height="100%">
                         This browser does not support PDFs. Please download the XML to view it: <a href={path}>Download PDF</a>"
                     </iframe>
                 </object>;
@@ -28,17 +28,17 @@ export default function DocumentViewer(props) {
         }
         else if (pathLower.includes(".las")) {
             fileContainerHTML = 
-            <iframe id="d1" width="100%" height="100%" src={path}><p>Your browser does not support iframes.</p></iframe>;
+            <iframe title="file-viewer" width="100%" height="100%" src={path}><p>Your browser does not support iframes.</p></iframe>;
         }
         else if (pathLower.includes(".jpg") || pathLower.includes(".jpeg") || pathLower.includes(".gif") || pathLower.includes(".png")) {
             fileContainerHTML =
                 <div className="file-container">
-                    <img style='max-width:100%;' src={path}/>
+                    <img className="image-style" src={path} alt="the search result"/>
                 </div>;
         }
         else if (pathLower.includes(".xml")) {
             fileContainerHTML =
-                <iframe className="file-container" src={path} type="text/xml">
+                <iframe title="file-viewer" className="file-container" src={path} type="text/xml">
                     This browser does not support XMLs. Please download the XML to view it: <a href={path}>Download XML</a>"
                 </iframe>;
         }
@@ -63,7 +63,7 @@ export default function DocumentViewer(props) {
             var src = "https://view.officeapps.live.com/op/view.aspx?src=" + encodeURIComponent(path);
 
             fileContainerHTML =
-                <iframe className="file-container" src={src}></iframe>;
+                <iframe title="file-viewer" className="file-container" src={src}></iframe>;
         }
         else {
             fileContainerHTML =

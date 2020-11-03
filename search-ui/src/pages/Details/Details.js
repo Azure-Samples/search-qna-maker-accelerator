@@ -64,7 +64,7 @@ export default function Details() {
     <div className="main main--details container fluid">
       <div className="card text-center result-container">
         <div className="card-header">
-        <ul className="nav nav-tabs card-header-tabs">
+          <ul className="nav nav-tabs card-header-tabs">
               <li className="nav-item">
                 <button className={tab_0_style} onClick={() => setTab(0)}>Document</button>
               </li>

@@ -4,3 +4,7 @@
     width: 100%;
     min-height: inherit;
 }
+
+.image-style {
+    max-width: 100%;
+}
