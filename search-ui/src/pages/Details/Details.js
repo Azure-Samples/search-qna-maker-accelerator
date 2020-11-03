@@ -35,78 +35,50 @@ export default function Details() {
   }, [id]);
 
   var body;
+  let tab_0_style = "nav-link";
+  let tab_1_style = "nav-link";
+  let tab_2_style = "nav-link";
   if (isLoading) {
     body = (<CircularProgress />);
   } else {
-    body = (<DocumentViewer document={document} sasToken={sasToken}></DocumentViewer>)
+    if (selectedTab === 0) {
+      body = (<DocumentViewer document={document} sasToken={sasToken}></DocumentViewer>);
+      tab_0_style = "nav-link active";
+    }
+    else if (selectedTab === 1) {
+      body = (<Transcript document={document}></Transcript>);
+      tab_1_style = "nav-link active";
+    }
+    else if (selectedTab === 2) {
+      body = <div className="card-body text-left">
+              <pre>
+                <code>{JSON.stringify(document, null, 2)}</code>
+              </pre>
+            </div>;
+      tab_2_style = "nav-link active";
+    }
+
   }
 
-  if (selectedTab === 0) {
-    return (
-      <div className="main main--details container fluid">
-        <div className="text-center result-container">
-          <div className="card-header">
-            <ul className="nav nav-tabs card-header-tabs">
+  return (
+    <div className="main main--details container fluid">
+      <div className="card text-center result-container">
+        <div className="card-header">
+        <ul className="nav nav-tabs card-header-tabs">
               <li className="nav-item">
-                <button className="nav-link active" onClick={() => setTab(0)}>Document</button>
+                <button className={tab_0_style} onClick={() => setTab(0)}>Document</button>
               </li>
               <li className="nav-item">
-                <button className="nav-link" onClick={() => setTab(1)}>Transcript</button>
+                <button className={tab_1_style} onClick={() => setTab(1)}>Transcript</button>
               </li>
               <li className="nav-item">
-                <button className="nav-link" onClick={() => setTab(2)}>Raw Data</button>
-              </li>
-            </ul>
-          </div>
-          {body}
-        </div>
-      </div>
-    );
-  } 
-  else if (selectedTab === 1) {
-    return (
-      <div className="main main--details container fluid">
-        <div className="card text-center result-container">
-          <div className="card-header">
-            <ul className="nav nav-tabs card-header-tabs">
-              <li className="nav-item">
-                <button className="nav-link" onClick={() => setTab(0)}>Document</button>
-              </li>
-              <li className="nav-item">
-                <button className="nav-link active" onClick={() => setTab(1)}>Transcript</button>
-              </li>
-              <li className="nav-item">
-                <button className="nav-link" onClick={() => setTab(2)}>Raw Data</button>
+                <button className={tab_2_style} onClick={() => setTab(2)}>Raw Data</button>
               </li>
             </ul>
-          </div>
-          <Transcript document={document}></Transcript>
         </div>
+        {body}
       </div>
-    );
-  } else {
-    return (
-      <div className="main main--details container fluid">
-        <div className="card text-center">
-          <div className="card-header">
-            <ul className="nav nav-tabs card-header-tabs">
-              <li className="nav-item">
-                <button className="nav-link" onClick={() => setTab(0)}>Document</button>
-              </li>
-              <li className="nav-item">
-                <button className="nav-link" onClick={() => setTab(1)}>Transcript</button>
-              </li>
-              <li className="nav-item">
-                <button className="nav-link active" onClick={() => setTab(2)}>Raw Data</button>
-              </li>
-            </ul>
-          </div>
-          <div className="card-body text-left">
-            <pre><code>{JSON.stringify(document, null, 2)}</code></pre>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 }
 
