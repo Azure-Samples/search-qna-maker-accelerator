@@ -74,7 +74,7 @@ module.exports = async function (context, req) {
             facets: Object.keys(facets),
             filter: createFilterExpression(filters, facets),
             highlightFields: "content",
-            searchMode: "all"
+            searchMode: "any"
         };
 
         // Sending the search request
