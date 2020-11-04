@@ -20,7 +20,7 @@ const generateSasToken = (accountName, accountKey, container, blob, permissions)
     const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
 
     var expiryDate = new Date();
-    expiryDate.setHours(expiryDate.getHours() + 2);
+    expiryDate.setMinutes(expiryDate.getMinutes() + 10);
 
     const sasKey = generateBlobSASQueryParameters({
         containerName: container,
@@ -35,7 +35,6 @@ const generateSasToken = (accountName, accountKey, container, blob, permissions)
 
 module.exports = async function (context, req) {
     
-    //context.log(req);
 
     // Reading inputs from HTTP Request
     const id = (req.query.id || (req.body && req.body.id));
@@ -45,9 +44,6 @@ module.exports = async function (context, req) {
 
     const permissions = 'r';
     const sasToken = generateSasToken(storageAccountName, storageAccountKey, storageContainerName, document.metadata_storage_name, permissions);
-
-    //context.log(document);
-    context.log(sasToken);
 
     context.res = {
         // status: 200, /* Defaults to 200 */
