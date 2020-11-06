@@ -10,6 +10,12 @@ This solution accelerator contains the following artifacts:
 + Custom skill in Cognitive Search, which ingests the data into QnA Maker
 + User interface to view the results
 
+## Live demo
+
+You can view a live demo of this repo at the following link:
+
+[https://ambitious-tree-00baa321e.azurestaticapps.net](https://ambitious-tree-00baa321e.azurestaticapps.net)
+
 ## Deploy
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fjennifermarsman%2Fcognitive-search-qna-solution%2Fmain%2Fazuredeploy.json)

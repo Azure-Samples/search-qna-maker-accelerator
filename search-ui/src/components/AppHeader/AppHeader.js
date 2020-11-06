@@ -27,7 +27,7 @@ export default function AppHeader(props) {
               <a className="nav-link" href="/Search">Search</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/Upload">Documents</a>
+              <a className="nav-link" href="/Upload">Upload</a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href={kbUrl}>Knowledge Base</a>

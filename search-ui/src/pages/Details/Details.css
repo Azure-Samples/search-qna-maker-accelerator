@@ -1,11 +1,25 @@
 .main--details {
     padding-top: 1em;
     width: 100%;
+    height: 100%;
 };
 
 .image {
     width: 10em;
     height: auto;
+}
+
+.nav-tabs {
+    margin-left: 1em;
+
+}
+
+.black {
+    color: black;
+}
+
+.black.hover {
+    color: white;
 }
 
 .result-container {
@@ -17,4 +31,31 @@
 
 #tags-panel {
     margin-top: 1em;
+}
+
+.tag-container {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: 1em;
+}
+
+.tag {
+    background-color: #0078d7;
+    border: 1px solid transparent;
+    border-radius: 0;
+    color: #fff;
+    display: inline-block;
+    font-size: 13px;
+    line-height: 1;
+    margin: 2px 2px 2px 0;
+    max-width: 100%;
+    opacity: 1;
+    padding: .4em .5em;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    transition: all .15s ease-in-out;
+    white-space: nowrap;
 }

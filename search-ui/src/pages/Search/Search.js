@@ -95,7 +95,6 @@ export default function Search() {
       if (stopWords.indexOf(words[i].trim()) < 0 ) {
         output.push(words[i]);
       }
-      
     }
 
     return output.join(" ");

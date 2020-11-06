@@ -63,11 +63,6 @@ export default function Transcript(props) {
         return (
             <div style={overflow}>
                 <table className="table table-hover table-striped table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Original Content</th>
-                        </tr>
-                    </thead>
                     <tbody>
                         <tr>
                             <td className="wrapword">

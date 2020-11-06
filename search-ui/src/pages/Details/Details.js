@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from 'react-router-dom';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Transcript from '../../components/Transcript/Transcript';
@@ -7,6 +7,7 @@ import DocumentViewer from '../../components/DocumentViewer/DocumentViewer';
 import axios from 'axios';
 
 import "./Details.css";
+import SearchBar from "../../components/SearchBar/SearchBar";
 
 export default function Details() {
 
@@ -15,6 +16,8 @@ export default function Details() {
   const [sasToken, setSasToken] = useState("");
   const [selectedTab, setTab] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [q, setQ] = useState("");
+  const searchBar = useRef(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -34,20 +37,49 @@ export default function Details() {
 
   }, [id]);
 
+  useEffect(() => {
+    console.log("q");
+    console.log(q);
+
+  }, [q]);
+
+  function GetTagsHTML(tags) {
+
+    if (!!tags) {
+      let tagsHtml = tags.map((tagValue, index) => {
+        if (index < 10) {
+  
+          if (tagValue.length > 30) { // check tag name length
+            // create substring of tag name length if too long
+            tagValue = tagValue.substring(0, 30);
+          }
+  
+          return <button className="tag" onclick="HighlightTag(event)">{tagValue}</button>;
+        }
+      });
+  
+      return tagsHtml;
+    }
+  }
+
+  let tags = GetTagsHTML(document.keyPhrases);
+
+
+
   var body;
-  let tab_0_style = "nav-link";
-  let tab_1_style = "nav-link";
-  let tab_2_style = "nav-link";
+  let tab_0_style = "nav-link black";
+  let tab_1_style = "nav-link black";
+  let tab_2_style = "nav-link black";
   if (isLoading) {
     body = (<CircularProgress />);
   } else {
     if (selectedTab === 0) {
       body = (<DocumentViewer document={document} sasToken={sasToken}></DocumentViewer>);
-      tab_0_style = "nav-link active";
+      tab_0_style = "nav-link active black";
     }
     else if (selectedTab === 1) {
       body = (<Transcript document={document}></Transcript>);
-      tab_1_style = "nav-link active";
+      tab_1_style = "nav-link active black";
     }
     else if (selectedTab === 2) {
       body = <div className="card-body text-left">
@@ -55,16 +87,18 @@ export default function Details() {
           <code>{JSON.stringify(document, null, 2)}</code>
         </pre>
       </div>;
-      tab_2_style = "nav-link active";
+      tab_2_style = "nav-link active black";
     }
 
   }
 
+
+
   return (
-    <div className="main main--details container fluid">
-      <div id="details" className="card text-center ">
-        <div className="card-header">
-          <ul className="nav nav-tabs card-header-tabs">
+    <div className="main main--details fluid">
+      <div id="details" className="text-center ">
+        <div >
+          <ul className="nav nav-tabs">
             <li className="nav-item">
               <button className={tab_0_style} onClick={() => setTab(0)}>Document</button>
             </li>
@@ -82,8 +116,8 @@ export default function Details() {
           </div>
 
           <div id="tags-panel" className="col-md-4">
-            <div id="transcript-search-box">
-              <div >
+            <div >
+              <div id="transcript-search-box" >
                 <div className="input-group">
                   <input
                     autoComplete="off" // setting for browsers; not the app
@@ -91,24 +125,22 @@ export default function Details() {
                     id="search-box"
                     className="form-control rounded-0"
                     placeholder="Search within this document..."
-                  // onChange={onChangeHandler} 
-                  // defaultValue={props.q}
-                  // onClick={() => setShowSuggestions(true)}
+                    ref={searchBar}
                   >
                   </input>
                   <div className="input-group-btn">
-                    <button className="btn btn-primary rounded-0" type="submit" >
+                    <button className="btn btn-primary rounded-0" type="submit" onClick={() => setQ(searchBar.current.value)} >
                       Search
                     </button>
                   </div>
                 </div>
               </div>
-              <div id="details-viewer"></div>
-              <div id="tag-viewer"></div>
+              <div id="tags-container" className="tag-container">
+                {tags}
+              </div>
               <hr />
               <div id="reference-viewer"></div>
             </div>
-            <input id="result-id" type="hidden" />
           </div>
         </div>
       </div>
