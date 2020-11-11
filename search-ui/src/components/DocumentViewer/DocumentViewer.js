@@ -42,7 +42,10 @@ export default function DocumentViewer(props) {
                 </iframe>;
         }
         else if (pathLower.includes(".htm")) {
-            fileContainerHTML = <div>{ReactHtmlParser(content)}</div>;
+            // let html = await fetch(path);
+            // fileContainerHTML = <div>{ReactHtmlParser(html)}</div>;
+            fileContainerHTML = 
+            <iframe title="file-viewer" width="100%" height="100%" src={path}>Your browser does not support iframes.</iframe>;
         }
         else if (pathLower.includes(".mp3")) {
             fileContainerHTML =
