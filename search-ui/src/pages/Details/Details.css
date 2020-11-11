@@ -18,15 +18,15 @@
     color: black;
 }
 
-.black.hover {
-    color: white;
+.black:hover {
+    color: darkgray;
 }
 
 .result-container {
-    height: 100%;
     min-height: 40em;
     margin: 10px;
     border: 1px solid #ccc;
+    max-height: 100%;
 }
 
 #tags-panel {

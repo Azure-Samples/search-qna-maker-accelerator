@@ -7,7 +7,6 @@ export default function DocumentViewer(props) {
 
     const path = props.document.metadata_storage_path + "?" + props.sasToken;
     const content = props.document.content;
-    console.log(path);
 
 
     var fileContainerHTML;

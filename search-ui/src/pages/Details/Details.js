@@ -3,11 +3,11 @@ import { useParams } from 'react-router-dom';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Transcript from '../../components/Transcript/Transcript';
 import DocumentViewer from '../../components/DocumentViewer/DocumentViewer';
+import ReactHtmlParser from 'react-html-parser';
 
 import axios from 'axios';
 
 import "./Details.css";
-import SearchBar from "../../components/SearchBar/SearchBar";
 
 export default function Details() {
 
@@ -15,6 +15,7 @@ export default function Details() {
   const [document, setDocument] = useState({});
   const [sasToken, setSasToken] = useState("");
   const [selectedTab, setTab] = useState(0);
+  const [highlight, setHighlight] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [q, setQ] = useState("");
   const searchBar = useRef(null);
@@ -38,9 +39,7 @@ export default function Details() {
   }, [id]);
 
   useEffect(() => {
-    console.log("q");
-    console.log(q);
-
+    setHighlight(null);
   }, [q]);
 
   function GetTagsHTML(tags) {
@@ -48,23 +47,73 @@ export default function Details() {
     if (!!tags) {
       let tagsHtml = tags.map((tagValue, index) => {
         if (index < 10) {
-  
+
           if (tagValue.length > 30) { // check tag name length
             // create substring of tag name length if too long
             tagValue = tagValue.substring(0, 30);
           }
-  
-          return <button className="tag" onclick="HighlightTag(event)">{tagValue}</button>;
+
+          return <button key={index} className="tag" onClick={() => setQ(tagValue)}>{tagValue}</button>;
+        } else {
+          return null;
         }
       });
-  
+
       return tagsHtml;
     }
+
+    return null;
   }
 
   let tags = GetTagsHTML(document.keyPhrases);
 
+  function GetSnippets(q, content) {
+    if (!!content && q.trim() !== "") {
+      var regex = new RegExp(q, 'gi');
 
+      let matches = content.match(regex);
+
+      return matches.map((value, index) => {
+        var startIdx;
+        var ln = 400;
+
+        if (value.length > 150) {
+          startIdx = content.indexOf(value);
+          ln = value.length;
+        }
+        else {
+          if (content.indexOf(value) < 200) {
+            startIdx = 0;
+          }
+          else {
+            startIdx = content.indexOf(value) - 200;
+          }
+
+          ln = 400 + value.length;
+        }
+
+        var reference = content.substr(startIdx, ln);
+        content = content.replace(value, "");
+
+        reference = reference.replace(value, function (str) {
+          return (`<span class="highlight">${str}</span>`);
+        });
+
+        var shortName = value.slice(0, 20).replace(/[^a-zA-Z ]/g, " ").replace(new RegExp(" ", 'g'), "_");
+
+        return <li key={index}className='reference list-group-item' onClick={() => ClickSnippet(`${index}_${shortName}`)}>{ReactHtmlParser(reference)}</li>;
+
+      });
+    }
+  }
+
+  let snippets = GetSnippets(q, document.content);
+
+  function ClickSnippet(name) {
+    // navigating to the transcript
+    setTab(1);
+    setHighlight(name);
+  }
 
   var body;
   let tab_0_style = "nav-link black";
@@ -78,7 +127,7 @@ export default function Details() {
       tab_0_style = "nav-link active black";
     }
     else if (selectedTab === 1) {
-      body = (<Transcript document={document}></Transcript>);
+      body = (<Transcript document={document} q={q} highlight={highlight}></Transcript>);
       tab_1_style = "nav-link active black";
     }
     else if (selectedTab === 2) {
@@ -95,7 +144,7 @@ export default function Details() {
 
 
   return (
-    <div className="main main--details fluid">
+    <div className="main main--details">
       <div id="details" className="text-center ">
         <div >
           <ul className="nav nav-tabs">
@@ -139,7 +188,9 @@ export default function Details() {
                 {tags}
               </div>
               <hr />
-              <div id="reference-viewer"></div>
+              <div id="reference-viewer">
+                {snippets}
+              </div>
             </div>
           </div>
         </div>
