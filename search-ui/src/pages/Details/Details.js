@@ -50,7 +50,7 @@ export default function Details() {
 
           if (tagValue.length > 30) { // check tag name length
             // create substring of tag name length if too long
-            tagValue = tagValue.substring(0, 30);
+            tagValue = tagValue.slice(0, 30);
           }
 
           return <button key={index} className="tag" onClick={() => setQ(tagValue)}>{tagValue}</button>;
@@ -75,24 +75,25 @@ export default function Details() {
 
       return matches.map((value, index) => {
         var startIdx;
-        var ln = 400;
+        var maxLengthOfSnippet = 400;
+        var ln = maxLengthOfSnippet;
 
         if (value.length > 150) {
           startIdx = content.indexOf(value);
           ln = value.length;
         }
         else {
-          if (content.indexOf(value) < 200) {
+          if (content.indexOf(value) < (maxLengthOfSnippet / 2)) {
             startIdx = 0;
           }
           else {
-            startIdx = content.indexOf(value) - 200;
+            startIdx = content.indexOf(value) - (maxLengthOfSnippet / 2);
           }
 
-          ln = 400 + value.length;
+          ln = maxLengthOfSnippet + value.length;
         }
 
-        var reference = content.substr(startIdx, ln);
+        var reference = content.slice(startIdx, startIdx + ln);
         content = content.replace(value, "");
 
         reference = reference.replace(value, function (str) {

@@ -37,6 +37,7 @@ export default function Transcript(props) {
         return null;
     }
 
+    // finds all matches to the search term in the transcript and adds a highlight class to them (plus an id that can be used for scrolling)
     function GetReferences(searchText, content) {
         // find all matches in content
         var regex = new RegExp(searchText, 'gi');
