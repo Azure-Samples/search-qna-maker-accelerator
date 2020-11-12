@@ -57,6 +57,7 @@ export default function Search() {
   useEffect(() => {
     history.push('/search?q=' + q);
     setCurrentPage(1);
+    setFilters([]);
     const body = {
       q: q
     };

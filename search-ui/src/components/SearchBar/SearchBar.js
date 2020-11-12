@@ -17,7 +17,7 @@ export default function SearchBar(props) {
 
     const onEnterButton = (event) => {
         if (event.keyCode === 13) {
-            onSearchHandler()
+            onSearchHandler();
         }
     }
 
