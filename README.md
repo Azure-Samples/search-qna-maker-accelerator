@@ -72,8 +72,6 @@ The data we used to test with [can be found here](https://github.com/JerryWei03/
 
 ## TODO
 
-1. Build/integrate frontend
-1. Add website deployment to the ARM template once the frontend is built. [See here for example.](https://github.com/Azure/azure-quickstart-templates/tree/master/201-web-app-github-deploy)
 1. [Have the function app use the included hosting plan](https://docs.microsoft.com/azure/azure-functions/functions-scale#app-service-plan) instead of needing to deploy a second one.
     1. I am unsure based on the parameters that QnA uses for the hosting plan for their required web app if we can also tack on the function, so that will need to be investigated/tested. 
     1. You will likely also want to use the same hosting plan for the frontend website to be included with the sample so ideally it would host all 3 resources when it is all said and done.
