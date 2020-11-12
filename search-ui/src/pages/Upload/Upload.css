@@ -1,16 +1,28 @@
-.home-search {
-    margin: 5em auto;
-    max-width: 45%;
-    display: block;
+.main--upload {
+    padding:3em;
+    width: fit-content;
 }
 
-.logo {
-    height: 12em;
-    width: auto;
-    display:block;
-    margin: auto auto 0;
+.upload-text {
+    font-size: 3em;
 }
 
-.poweredby {
-    text-align: center;
+input[type="file"] {
+    display: none;
+}
+.custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.file-select {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.file-name {
+    display: inline-block;
+    padding-left: 1em;
 }

@@ -1,5 +1,4 @@
 import React from 'react'
-import ReactHtmlParser from 'react-html-parser';
 
 import './DocumentViewer.css';
 
@@ -7,7 +6,6 @@ export default function DocumentViewer(props) {
 
     const path = props.document.metadata_storage_path + "?" + props.sasToken;
     const content = props.document.content;
-    console.log(path);
 
 
     var fileContainerHTML;
@@ -43,7 +41,8 @@ export default function DocumentViewer(props) {
                 </iframe>;
         }
         else if (pathLower.includes(".htm")) {
-            fileContainerHTML = <div>{ReactHtmlParser(content)}</div>;
+            fileContainerHTML = 
+            <iframe title="file-viewer" width="100%" height="100%" src={path}>Your browser does not support iframes.</iframe>;
         }
         else if (pathLower.includes(".mp3")) {
             fileContainerHTML =
