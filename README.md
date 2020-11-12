@@ -12,15 +12,35 @@ This solution accelerator contains the following artifacts:
 
 ## Deploy
 
+All the services and components needed for the solution are packaged in the ARM template. Click the `Deploy to Azure` button to get started. The following resources will be deployed:
+
+1. Azure Cognitive Search
+2. QnA Maker Cognitive Service
+3. Azure App Service, App Service Plan
+4. Azure App Service, Website
+5. Storage Account
+6. Azure Function App
+7. Cognitive Services All in One resource
+
+## Configure solution
+
+1. Deploy the ARM template by clicking the button below. Copy the following properties from the outputs tab once the deployment completes.
+ 
+    + Search Service Name
+    + Search service API Key
+    + Storage Account Connection String
+    + Cognitive Services AllInOne Key
+    + Function App Name
+    + Function Host Code
+
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fjennifermarsman%2Fcognitive-search-qna-solution%2Fmain%2Fazuredeploy.json)
 
-## How to use
-
-1. Deploy the ARM template using the button above.
+1. Create a new blob container in the deployed storage account, and copy your data files into it. If you need a sample dataset see [data](#data). The container name will be used as the storage-container-name in the next step.
 1. Download [the Postman collection](./QnA.postman_collection.json) and import it into Postman.
 
     The Postman collection requires the following parameters:
     + search-service-name
+    + search-service-admin-key
     + data-source-name
     + api-version
     + index-name
@@ -31,6 +51,33 @@ This solution accelerator contains the following artifacts:
     + cog-svc-allinone-key
     + function-name
     + function-code
+
+To add the parameters, click on the `Manage Environments` button under to ribbon on the top right of the Postman window.
+![Manage Environments](media/postman_manageenv.png)
+
+Set the following environment variables coped from the outputs of the deployment.
+
++ search-service-name
++ search-service-admin-key
++ storage-connection-string
++ cog-svc-allinone-key
++ function-name
++ function-code
+
+Set the following to a meaningful name:
+
++ data-source-name
++ index-name
++ skillset-name
++ indexer-name
+
++ api-version : 2020-06-30-Preview
++ storage-container-name : Your container name from step 2.
+
+Once complete your save your environment. Your environment should look like this.
+![Environment](/media/postmanenv.png)
+
+
 1. When the deployment finishes, go to the "Outputs" and copy and paste the outputs into the corresponding variables for the Postman collection.
 1. Create a new blob container with name that you specified in the Postman variables in the deployed storage account, and copy your data files into it.
 1. Create a knowledge base in your newly deployed QnAMaker instance at [https://www.qnamaker.ai/](https://www.qnamaker.ai/). Don't add any data to it or publish it yet.
