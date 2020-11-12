@@ -53,6 +53,7 @@ All the services and components needed for the solution are packaged in the ARM 
     + function-code
 
 To add the parameters, click on the `Manage Environments` button under to ribbon on the top right of the Postman window.
+
 ![Manage Environments](media/postman_manageenv.png)
 
 Set the following environment variables coped from the outputs of the deployment.
@@ -70,19 +71,16 @@ Set the following to a meaningful name:
 + index-name
 + skillset-name
 + indexer-name
-
 + api-version : 2020-06-30-Preview
 + storage-container-name : Your container name from step 2.
 
 Once complete your save your environment. Your environment should look like this.
-![Environment](/media/postmanenv.png)
 
+![Environment](media/postman_env.png)
 
-1. When the deployment finishes, go to the "Outputs" and copy and paste the outputs into the corresponding variables for the Postman collection.
-1. Create a new blob container with name that you specified in the Postman variables in the deployed storage account, and copy your data files into it.
 1. Create a knowledge base in your newly deployed QnAMaker instance at [https://www.qnamaker.ai/](https://www.qnamaker.ai/). Don't add any data to it or publish it yet.
     1. Grab the id for the knowledge base from the url, it will look something like this "https://www.qnamaker.ai/Edit/KnowledgeBase? kbId=**KnowledgeBaseID**&tenantId=**TenantId**" where you want the **KnowledgeBaseID**.
-    1. [Add an application setting](https://docs.microsoft.com/en-us/azure/azure-functions/functions-how-to-use-azure-function-app-settings#portal) for the deployed function instance called "KnowledgeBaseID" with the value of the knowledge id you just grabbed.
+    1. [Update the application settings](https://docs.microsoft.com/en-us/azure/azure-functions/functions-how-to-use-azure-function-app-settings#portal) for the deployed function instance, set "KnowledgeBaseID" to the value of the knowledge id you just grabbed.
     1. Make sure to save (say yes to it being ok to restart the function).
 1. Run the Postman commands in order:
     1. Create Datasource
