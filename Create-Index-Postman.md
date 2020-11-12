@@ -25,6 +25,7 @@ Set the environment using the dropdown highlighted below and then update the env
 ![edit environment variables](./images/postman_edit_environment_variables.png)
 
 The Postman collection requires the following parameters:
+
 + **search-service-name** - the name of your Azure Cognitive Search Service; this can be found in the deployment outputs 
 + **data-source-name** - the name of your search data source; this can be whatever you want
 + **index-name** - the name of your search index; this can be whatever you want

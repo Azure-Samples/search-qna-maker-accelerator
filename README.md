@@ -25,11 +25,21 @@ This solution accelerator contains the following artifacts:
 
 ### 1. Deploy Resources
 
-Start by clicking the the neccessary resources onto Azure:
+The services and components needed for the solution are packaged in the [ARM template](./azuredeploy.json). Click the **Deploy to Azure** button to get started. 
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fjennifermarsman%2Fcognitive-search-qna-solution%2Fmain%2Fazuredeploy.json)
 
-Once the deployment finishes, navigate over to the **Outputs** tab to get the names and keys of your service. You'll use these values in the next step.
+The following resources will be deployed:
+
+1. Azure Cognitive Search
+2. QnA Maker Cognitive Service
+3. Azure App Service, App Service Plan
+4. Azure App Service, Website
+5. Storage Account
+6. Azure Function App
+7. Cognitive Services All-in-one resource
+
+Once the deployment finishes, navigate over to the **Outputs** tab to get the names and keys of your services. You'll use these values in step #4.
 
 ![Deployment screenshot](./images/deployment.png)
 
@@ -58,11 +68,11 @@ Navigate to [**Creade-Index-Postman.md**](./Create-Index-Postman.md) for full de
 
 ### 5. Set up the UI
 
-With the search index created, you're ready to spin up the UI to start searching! The UI is a React based [Azure Static Web App](https://azure.microsoft.com/services/app-service/static/) available in the `search-ui` folder.
+With the search index created, you're ready to spin up the UI to start searching! The UI is a React based [Azure Static Web App](https://azure.microsoft.com/services/app-service/static/) available in the `SearchUI` folder.
 
-Navigate to [**search-ui/README.md**](search-ui/README.md) for full details on how to create, edit, and use the web app. 
+Navigate to [**SearchUI/README.md**](search-ui/README.md) for full details on how to create, edit, and use the web app. 
 
-Within a few minutes, you'll have a UI that looks like this:
+Within a few minutes, you'll have a UI with a search experience that looks like this:
 
 ![Screenshot of sample web app](./images/search-results.png)
 
@@ -70,7 +80,7 @@ Within a few minutes, you'll have a UI that looks like this:
 ## Data
 The data we used to test with [can be found here](https://github.com/JerryWei03/COVID-Q/tree/master/data/PDFs) if you want to reuse it.  Some of these files consistently fail upload to QnAMaker for reasons unknown to me. Make sure if we end up using this for the final demo that [we reference the author](https://github.com/JerryWei03/COVID-Q#citation) and verify the licensing as appropriate.
 
-## TODO
+## To-do
 
 1. [Have the function app use the included hosting plan](https://docs.microsoft.com/azure/azure-functions/functions-scale#app-service-plan) instead of needing to deploy a second one.
     1. I am unsure based on the parameters that QnA uses for the hosting plan for their required web app if we can also tack on the function, so that will need to be investigated/tested. 
