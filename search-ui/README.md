@@ -39,7 +39,12 @@ The `local.settings.json` file holds all of the keys that the application needs 
 
     "QnAMakerEndpoint": "",
     "QnAMakerKey": "",
-    "QnAMakerKnowledgeBaseId": ""
+    "QnAMakerKnowledgeBaseId": "",
+
+    "StorageAccountName": "",
+    "StorageAccountKey": "",
+    "StorageContainerName": ""
+  }
   }
 }
 ```
