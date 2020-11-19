@@ -40,7 +40,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             {
                 return new BadRequestObjectResult($"{skillName} - Invalid request record array.");
             }
-            var msgs = new QnAQueueMessageBatch(); 
+            var msgBatch = new QnAQueueMessageBatch(); 
             WebApiSkillResponse response = WebApiSkillHelpers.ProcessRequestRecords(skillName, requestRecords,
                 (inRecord, outRecord) =>
                 {
@@ -62,12 +62,20 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                         FileName = blobName,
                         FileUri = fileUri
                     };
-                    msgs.Values.Add(queueMessage);
+                    msgBatch.Values.Add(queueMessage);
+                    if (msgBatch.Values.Count == 10)
+                    {
+                        msg.Add(msgBatch);
+                        msgBatch.Values.Clear();
+                    }
                     outRecord.Data["status"] = "InQueue";
                     return outRecord;
                 });
             // Add a list of <= 10 files into one message to be extracted as a batch. 
-            msg.Add(msgs);
+            if (msgBatch.Values.Count > 0)
+            {
+                msg.Add(msgBatch);
+            }
             return new OkObjectResult(response);
         }
 
@@ -180,13 +188,13 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
         // </MonitorOperation>
 
         // Checks valid file type before sending for extraction
-        private static bool IsValidFile(string file)
+        private static bool IsValidFile(string fileName)
         {
             HashSet<string> fileExtensions = new HashSet<string> { "tsv", "pdf", "txt", "docx", "xlsx" };
             string urlExtension;
             try
             {
-                urlExtension = Path.GetExtension(file).ToLower().TrimStart('.');
+                urlExtension = Path.GetExtension(fileName).ToLower().TrimStart('.');
             }
             catch
             {
@@ -205,7 +213,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 if(error != null && error.Any())
                 {
                     var errorResponse = error.ToList().First();
-                    log.LogError(errorResponse.Message + " " + errorResponse.Target);
+                    log.LogError("upload-to-qna-queue-trigger: " + errorResponse.Message + " " + errorResponse.Target);
                     operationState = OperationStateType.Failed;
                 }
             }
