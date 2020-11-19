@@ -68,7 +68,6 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 });
             // Add a list of <= 10 files into one message to be extracted as a batch. 
             msg.Add(msgs);
-            log.LogInformation("UploadToQnAMaker Custom Skill: " + msgs.Values.Count);
             return new OkObjectResult(response);
         }
 
@@ -84,12 +83,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 Endpoint = $"https://{GetAppSetting("QnAServiceName")}.cognitiveservices.azure.com"
             };
 
-            var updateKB = new UpdateKbOperationDTO();
-            updateKB.Delete = new UpdateKbOperationDTODelete();
-            updateKB.Delete.Sources = new List<string>();
-            updateKB.Add = new UpdateKbOperationDTOAdd();
-            updateKB.Add.Files = new List<FileDTO>();
-
+            var updateKB = InitUpdateKB();
             var indexDocuments = new List<IndexDocument>();
             foreach (var msg in qnaQueueMessage.Values)
             {
@@ -110,12 +104,12 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             var updateOp = await UpdateKB(qnaClient, updateKB, log);
             updateOp = await MonitorOperation(qnaClient, updateOp, log);
             stopwatch.Stop();
-            log.LogInformation("upload-to-qna-queue-trigger: update operation time = " + stopwatch.Elapsed.Seconds + " Number of files processed = " + updateKB.Add.Files.Count);
+            log.LogInformation("upload-to-qna-queue-trigger: update operation time = " + stopwatch.Elapsed.Seconds + " seconds. Number of files processed = " + updateKB.Add.Files.Count);
 
             foreach ( var msg in qnaQueueMessage.Values)
             {
-                int x = indexDocuments.IndexOf(new IndexDocument { id = msg.Id });
-                indexDocuments[x].status = GetOperationStatus(updateOp, msg.FileName, log);
+                var indexDocument = indexDocuments.Where(doc => doc.id == msg.Id).ToList().First();
+                indexDocument.status = GetOperationStatus(updateOp, msg.FileName, log);
             }
 
             var searchClient = new SearchClient(
@@ -156,7 +150,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 request.Method = HttpMethod.Patch;
                 request.RequestUri = new Uri(uri);
 
-                if (!String.IsNullOrEmpty(body))
+                if (!string.IsNullOrEmpty(body))
                 {
                     request.Content = new StringContent(body, Encoding.UTF8, "application/json");
                 }
@@ -207,17 +201,27 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             string operationState = OperationStateType.Succeeded;
             if (operation.OperationState != OperationStateType.Succeeded && operation.ErrorResponse != null)
             {
-                var error = operation.ErrorResponse.Error.Details.First();
-                error.Target = fileName;
-                var exists = operation.ErrorResponse.Error.Details.Contains(error);
-                if(exists)
+                var error = operation.ErrorResponse.Error.Details.Where(error => error.Target == fileName);
+                if(error != null && error.Any())
                 {
-                    log.LogError(error.Message + error.Target);
+                    var errorResponse = error.ToList().First();
+                    log.LogError(errorResponse.Message + " " + errorResponse.Target);
                     operationState = OperationStateType.Failed;
                 }
             }
 
             return operationState;
+        }
+
+        private static UpdateKbOperationDTO InitUpdateKB()
+        {
+            var updateKB = new UpdateKbOperationDTO();
+            updateKB.Delete = new UpdateKbOperationDTODelete();
+            updateKB.Delete.Sources = new List<string>();
+            updateKB.Add = new UpdateKbOperationDTOAdd();
+            updateKB.Add.Files = new List<FileDTO>();
+            return updateKB;
+
         }
 
         private static string GetAppSetting(string key)
