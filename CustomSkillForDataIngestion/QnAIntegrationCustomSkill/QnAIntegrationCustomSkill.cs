@@ -63,7 +63,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                         FileUri = fileUri
                     };
                     msgBatch.Values.Add(queueMessage);
-                    if (msgBatch.Values.Count == 10)
+                    if (msgBatch.Values.Count >= 10)
                     {
                         msg.Add(msgBatch);
                         msgBatch.Values.Clear();
@@ -71,7 +71,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                     outRecord.Data["status"] = "InQueue";
                     return outRecord;
                 });
-            // Add a list of <= 10 files into one message to be extracted as a batch. 
+            // Add a list of <= 10 files into one queue message to be extracted as a batch. 
             if (msgBatch.Values.Count > 0)
             {
                 msg.Add(msgBatch);
@@ -84,7 +84,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             [QueueTrigger("upload-to-qna", Connection = "AzureWebJobsStorage")] QnAQueueMessageBatch qnaQueueMessage,
             ILogger log)
         {
-            log.LogInformation("upload-to-qna-queue-trigger: C# Queue trigger function processed ");
+            log.LogInformation("upload-to-qna-queue-trigger: C# Queue trigger function processed");
 
             var qnaClient = new QnAMakerClient(new ApiKeyServiceClientCredentials(GetAppSetting("QnAAuthoringKey")))
             {
@@ -112,8 +112,9 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             var updateOp = await UpdateKB(qnaClient, updateKB, log);
             updateOp = await MonitorOperation(qnaClient, updateOp, log);
             stopwatch.Stop();
-            log.LogInformation("upload-to-qna-queue-trigger: update operation time = " + stopwatch.Elapsed.Seconds + " seconds. Number of files processed = " + updateKB.Add.Files.Count);
+            log.LogInformation("upload-to-qna-queue-trigger: update operation time = " + stopwatch.Elapsed.TotalSeconds + " seconds. Number of files processed = " + updateKB.Add.Files.Count);
 
+            // set the extraction status for each file
             foreach ( var msg in qnaQueueMessage.Values)
             {
                 var indexDocument = indexDocuments.Where(doc => doc.id == msg.Id).ToList().First();
@@ -191,29 +192,32 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
         private static bool IsValidFile(string fileName)
         {
             HashSet<string> fileExtensions = new HashSet<string> { "tsv", "pdf", "txt", "docx", "xlsx" };
-            string urlExtension;
+            string fileExtension;
             try
             {
-                urlExtension = Path.GetExtension(fileName).ToLower().TrimStart('.');
+                fileExtension = Path.GetExtension(fileName).ToLower().TrimStart('.');
             }
             catch
             {
-                urlExtension = string.Empty;
+                fileExtension = string.Empty;
             }
             
-            return fileExtensions.Contains(urlExtension);
+            return fileExtensions.Contains(fileExtension);
         }
 
+        // Returns the operation state after extraction for fileName
         private static string GetOperationStatus(Operation operation, string fileName, ILogger log)
         {
             string operationState = OperationStateType.Succeeded;
             if (operation.OperationState != OperationStateType.Succeeded && operation.ErrorResponse != null)
             {
+                // Checks if the fileName is present in the error response
                 var error = operation.ErrorResponse.Error.Details.Where(error => error.Target == fileName);
                 if(error != null && error.Any())
                 {
-                    var errorResponse = error.ToList().First();
-                    log.LogError("upload-to-qna-queue-trigger: " + errorResponse.Message + " " + errorResponse.Target);
+                    // Gets error details correspoding to the fileName if it exists 
+                    var errorDetails = error.ToList().First();
+                    log.LogError("upload-to-qna-queue-trigger: " + errorDetails.Message + " " + errorDetails.Target);
                     operationState = OperationStateType.Failed;
                 }
             }
