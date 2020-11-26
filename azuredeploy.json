@@ -177,7 +177,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-				"[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
+		"[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
                 "[resourceId('Microsoft.CognitiveServices/accounts', variables('qnaServiceName'))]"
             ],
             "properties": {
@@ -257,7 +257,7 @@
             "location": "[resourceGroup().location]",
             "properties": {}
         },
-		{
+	{
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
             "name": "appsettings",
@@ -325,8 +325,8 @@
             "type": "string",
             "value": "[listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
         },
-		"HTTP Trigger": {
-            "type": "String",
+	"HTTP Trigger": {
+            "type": "string",
             "value": "[concat('https://',variables('functionAppName'),'.azurewebsites.net/api/init-accelerator?code=',listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]"
         }
     }
