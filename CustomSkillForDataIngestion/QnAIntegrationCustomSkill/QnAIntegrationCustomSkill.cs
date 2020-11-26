@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.  
 using Azure.Search.Documents;
 using AzureCognitiveSearch.PowerSkills.Common;
+using Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.CognitiveServices.Knowledge.QnAMaker;
@@ -120,10 +121,10 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 var indexDocument = indexDocuments.Where(doc => doc.id == msg.Id).ToList().First();
                 indexDocument.status = GetOperationStatus(updateOp, msg.FileName, log);
             }
-
+            var indexName = string.Concat(GetAppSetting("Prefix"), Constants.indexName);
             var searchClient = new SearchClient(
                 new Uri($"https://{GetAppSetting("SearchServiceName")}.search.windows.net"),
-                "qna-idx",
+                indexName,
                 new Azure.AzureKeyCredential(GetAppSetting("SearchServiceApiKey")));
             // TODO check to make sure this already exists in the index i.e. the indexer has finished indexed this id
             // so that the indexer doesn't overwrite this status with the InQueue status (avoid race condition with indexer)

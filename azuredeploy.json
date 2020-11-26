@@ -177,7 +177,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-                "[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
+				"[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
                 "[resourceId('Microsoft.CognitiveServices/accounts', variables('qnaServiceName'))]"
             ],
             "properties": {
@@ -219,24 +219,12 @@
                             "value": "[variables('functionProject')]"
                         },
                         {
-                            "name": "SearchServiceName",
-                            "value": "[variables('searchServiceName')]"
-                        },
-                        {
-                            "name": "SearchServiceApiKey",
-                            "value": "[listAdminKeys(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), '2020-08-01').primaryKey]"
-                        },
-                        {
                             "name": "QnAServiceName",
                             "value": "[variables('qnaServiceName')]"
                         },
                         {
                             "name": "QnAAuthoringKey",
                             "value": "[listkeys(resourceId('Microsoft.CognitiveServices/accounts', variables('qnaServiceName')), '2017-04-18').key1]"
-                        },
-                        {
-                            "name": "KnowledgeBaseID",
-                            "value": ""
                         }
                     ]
                 }
@@ -268,6 +256,48 @@
             "kind": "CognitiveServices",
             "location": "[resourceGroup().location]",
             "properties": {}
+        },
+		{
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "name": "appsettings",
+            "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAllInOneName'))]",
+                "[resourceId('Microsoft.Web/Sites/sourcecontrols', variables('functionAppName'), 'web')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat('https://',variables('functionAppName'),'.azurewebsites.net/api/init-kb?code=',listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "functionCode": {
+                        "value": "[listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
+                    },
+                    "functionAppName": {
+                        "value": "[variables('functionAppName')]"
+                    },
+                    "storageConnectionString": {
+                        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value, ';')]"
+                    },
+                    "functionProject": {
+                        "value": "[variables('functionProject')]"
+                    },
+                    "searchServiceName": {
+                        "value": "[variables('searchServiceName')]"
+                    },
+                    "qnaServiceName": {
+                        "value": "[variables('qnaServiceName')]"
+                    },
+                    "cogServicesKey": {
+                        "value": "[listkeys(resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAllInOneName')), '2017-04-18').key1]"
+                    },
+                    "prefix": {
+                        "value": "[parameters('resourcePrefix')]"
+                    }
+                }
+            }
         }
     ],
     "outputs": {
@@ -294,6 +324,10 @@
         "Azure Function Host Code": {
             "type": "string",
             "value": "[listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
+        },
+		"HTTP Trigger": {
+            "type": "String",
+            "value": "[concat('https://',variables('functionAppName'),'.azurewebsites.net/api/init-accelerator?code=',listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]"
         }
     }
 }
