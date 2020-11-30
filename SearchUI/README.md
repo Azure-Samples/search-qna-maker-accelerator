@@ -39,7 +39,12 @@ The `local.settings.json` file holds all of the keys that the application needs 
 
     "QnAMakerEndpoint": "",
     "QnAMakerKey": "",
-    "QnAMakerKnowledgeBaseId": ""
+    "QnAMakerKnowledgeBaseId": "",
+
+    "StorageAccountName": "",
+    "StorageAccountKey": "",
+    "StorageContainerName": ""
+  }
   }
 }
 ```
@@ -87,13 +92,21 @@ Next, you need to create a Static Web App in the Azure portal. Click the button 
 
 This will walk you through the process of creating the web app and connecting it to your GitHub repo.
 
-After connecting to the repo, you'll be asked to include some build details. Set the Build Presets to `React` and then leave the other default values:
+After connecting to the repo, you'll be asked to include some build details. Set the Build Presets to `React` and then specify the following values for the other parameters:
 
 ![Azure Static Web Apps Configuration Screenshot](./images/setup.png)
 
 Once you create the static web app, it will automatically deploy the web app to a URL you can find within the portal.
 
 ![Azure Static Web Apps Configuration Screenshot](./images/static-web.png)
+
+**Important** - You'll need to make one edit to the default workflow yml file under `.github/workflows` for the application to compile correctly. Add the following `env` parameter under `- name: Build And Deploy` as shown below:
+
+```yml
+- name: Build And Deploy
+  env:
+    REQUIRED_OS_PACKAGES: "libsecret-1-dev"
+```
 
 The last thing you need to do is select configuration and then edit the application settings to add the credentials from `local.settings.json`. It may take a few minutes for this blade to become available in the portal.
 
