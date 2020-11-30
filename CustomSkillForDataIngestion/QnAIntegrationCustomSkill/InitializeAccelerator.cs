@@ -22,6 +22,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 {
     public static class InitializeAccelerator
     {
+        private static HttpClient httpClient = new HttpClient();
         // initializes the accelerator solution. 
         [FunctionName("init-accelerator")]
         public static async Task<IActionResult> Run(
@@ -36,11 +37,11 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
             try
             {
-                await CreateContainer(storageConnectionString, prefix, log);
-                await CreateDataSource(storageConnectionString, searchServiceEndpoint, basePath, prefix, log);
-                await CreateIndex(searchServiceEndpoint, prefix, log);
-                await CreateSkillSet(searchServiceEndpoint, basePath, prefix, log);
-                await CreateIndexer(searchServiceEndpoint, basePath, prefix, log);
+                await CreateContainer(storageConnectionString, log);
+                await CreateDataSource(storageConnectionString, searchServiceEndpoint, basePath, log);
+                await CreateIndex(searchServiceEndpoint, log);
+                await CreateSkillSet(searchServiceEndpoint, basePath, log);
+                await CreateIndexer(searchServiceEndpoint, basePath, log);
 
                 responseMessage = "Initialized accelerator successfully.";
             }
@@ -84,15 +85,14 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             return kbId;
         }
 
-        private static async Task CreateContainer(string connectionString, string prefix, ILogger log)
+        private static async Task CreateContainer(string connectionString, ILogger log)
         {
-            string containerName = string.Concat(prefix, Constants.containerName);
             try
             {
-                log.LogInformation("init-accelerator: Creating container " + containerName);
+                log.LogInformation("init-accelerator: Creating container " + Constants.containerName);
 
                 BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-                BlobContainerClient containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName);
+                BlobContainerClient containerClient = await blobServiceClient.CreateBlobContainerAsync(Constants.containerName);
             }
             catch (Exception e)
             {
@@ -101,21 +101,20 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             }
         }
 
-        private static async Task CreateDataSource(string storageConnection, string searchServiceEndpoint, string basePath, string prefix, ILogger log)
+        private static async Task CreateDataSource(string storageConnection, string searchServiceEndpoint, string basePath, ILogger log)
         {
-            string dataSourceName = string.Concat(prefix, Constants.dataSourceName);
-            log.LogInformation("init-accelerator: Creating data source " + dataSourceName);
+            log.LogInformation("init-accelerator: Creating data source " + Constants.dataSourceName);
 
             try
             {
-                string uri = string.Format("{0}/datasources/{1}?api-version={2}", searchServiceEndpoint, dataSourceName, Constants.apiVersion);
+                string uri = string.Format("{0}/datasources/{1}?api-version={2}", searchServiceEndpoint, Constants.dataSourceName, Constants.apiVersion);
                 var path = Path.Combine(basePath, "DataSource.json");
                 using (StreamReader r = new StreamReader(path))
                 {
                     var body = r.ReadToEnd();
-                    body = body.Replace("{{datasourcename}}", dataSourceName);
+                    body = body.Replace("{{datasourcename}}", Constants.dataSourceName);
                     body = body.Replace("{{connectionString}}", storageConnection);
-                    body = body.Replace("{{containerName}}", string.Concat(prefix, Constants.containerName));
+                    body = body.Replace("{{containerName}}", Constants.containerName);
 
                     var response = await Put(uri, body);
                     if (response.StatusCode != HttpStatusCode.Created)
@@ -134,14 +133,13 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             }
         }
 
-        private static async Task CreateIndex(string searchServiceEndpoint, string prefix, ILogger log)
+        private static async Task CreateIndex(string searchServiceEndpoint, ILogger log)
         {
-            string indexName = string.Concat(prefix, Constants.indexName);
-            log.LogInformation("init-accelerator: Creating index " + indexName);
+            log.LogInformation("init-accelerator: Creating index " + Constants.indexName);
             try
             {
                 var idxclient = new SearchIndexClient(new Uri(searchServiceEndpoint), new AzureKeyCredential(GetAppSetting("SearchServiceApiKey")));
-                SearchIndex index = new SearchIndex(indexName)
+                SearchIndex index = new SearchIndex(Constants.indexName)
                 {
                     Fields =
                 {
@@ -162,18 +160,17 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             }
         }
 
-        private static async Task CreateSkillSet(string searchServiceEndpoint, string basePath, string prefix, ILogger log)
+        private static async Task CreateSkillSet(string searchServiceEndpoint, string basePath, ILogger log)
         {
-            string skillSetName = string.Concat(prefix, Constants.skillSetName);
-            log.LogInformation("init-accelerator: Creating Skill Set " + skillSetName);
+            log.LogInformation("init-accelerator: Creating Skill Set " + Constants.skillSetName);
             try
             {
-                string uri = string.Format("{0}/skillsets/{1}?api-version={2}", searchServiceEndpoint, skillSetName, Constants.apiVersion);
+                string uri = string.Format("{0}/skillsets/{1}?api-version={2}", searchServiceEndpoint, Constants.skillSetName, Constants.apiVersion);
                 var path = Path.Combine(basePath, "SkillSet.json");
                 using (StreamReader r = new StreamReader(path))
                 {
                     var body = r.ReadToEnd();
-                    body = body.Replace("{{skillset-name}}", skillSetName);
+                    body = body.Replace("{{skillset-name}}", Constants.skillSetName);
                     body = body.Replace("{{function-name}}", GetAppSetting("WEBSITE_CONTENTSHARE"));
                     body = body.Replace("{{function-code}}", GetAppSetting("FunctionCode"));
                     body = body.Replace("{{cog-svc-allinone-key}}", GetAppSetting("CogServicesKey"));
@@ -196,21 +193,20 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
         }
 
-        private static async Task CreateIndexer(string searchServiceEndpoint, string basePath, string prefix, ILogger log)
+        private static async Task CreateIndexer(string searchServiceEndpoint, string basePath, ILogger log)
         {
-            string indexerName = string.Concat(prefix, Constants.indexerName);
-            log.LogInformation("init-accelerator: Creating indexer " + indexerName);
+            log.LogInformation("init-accelerator: Creating indexer " + Constants.indexerName);
             try
             {
-                string uri = string.Format("{0}/indexers/{1}?api-version={2}", searchServiceEndpoint, indexerName, Constants.apiVersion);
+                string uri = string.Format("{0}/indexers/{1}?api-version={2}", searchServiceEndpoint, Constants.indexerName, Constants.apiVersion);
                 var path = Path.Combine(basePath, "Indexer.json");
                 using (StreamReader r = new StreamReader(path))
                 {
                     var body = r.ReadToEnd();
-                    body = body.Replace("{{indexer-name}}", indexerName);
-                    body = body.Replace("{{index-name}}", string.Concat(prefix, Constants.indexName));
-                    body = body.Replace("{{datasource-name}}", string.Concat(prefix, Constants.dataSourceName));
-                    body = body.Replace("{{skillset-name}}", string.Concat(prefix, Constants.skillSetName));
+                    body = body.Replace("{{indexer-name}}", Constants.indexerName);
+                    body = body.Replace("{{index-name}}", Constants.indexName);
+                    body = body.Replace("{{datasource-name}}", Constants.dataSourceName);
+                    body = body.Replace("{{skillset-name}}", Constants.skillSetName);
 
                     var response = await Put(uri, body);
                     if (response.StatusCode != HttpStatusCode.Created)
@@ -252,7 +248,6 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
         private static async Task<HttpResponseMessage> Put(string uri, string body)
         {
             var key = GetAppSetting("SearchServiceApiKey");
-            using (var client = new HttpClient())
             using (var request = new HttpRequestMessage())
             {
                 request.Method = HttpMethod.Put;
@@ -266,7 +261,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 request.Headers.Add("api-key", $"{key}");
                 request.Headers.Add("content", "application/json");
 
-                var response = await client.SendAsync(request);
+                var response = await httpClient.SendAsync(request);
                 return response;
             }
         }
