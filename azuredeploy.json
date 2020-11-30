@@ -159,26 +159,26 @@
                 "hostingEnvironment": ""
             }
         },
-      {
-        "type": "Microsoft.Storage/storageAccounts",
-        "name": "[variables('storageAccountName')]",
-        "apiVersion": "2019-06-01",
-        "location": "[resourceGroup().location]",
-        "kind": "Storage",
-        "sku": {
-          "name": "[parameters('storageAccountType')]"
-        }
-      },
-      {
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2019-06-01",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "[parameters('storageAccountType')]"
+            }
+        },
+        {
             "apiVersion": "2019-08-01",
             "name": "[variables('functionAppName')]",
             "type": "Microsoft.Web/sites",
             "kind": "functionapp",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-              "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-              "[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
-              "[resourceId('Microsoft.CognitiveServices/accounts', variables('qnaServiceName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
+                "[resourceId('Microsoft.CognitiveServices/accounts', variables('qnaServiceName'))]"
             ],
             "properties": {
                 "name": "[variables('functionAppName')]",
@@ -246,18 +246,18 @@
                 }
             ]
         },
-      {
-        "name": "[variables('cognitiveServicesAllInOneName')]",
-        "type": "Microsoft.CognitiveServices/accounts",
-        "apiVersion": "2017-04-18",
-        "sku": {
-          "name": "S0"
+        {
+            "name": "[variables('cognitiveServicesAllInOneName')]",
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2017-04-18",
+            "sku": {
+                "name": "S0"
+            },
+            "kind": "CognitiveServices",
+            "location": "[resourceGroup().location]",
+            "properties": {}
         },
-        "kind": "CognitiveServices",
-        "location": "[resourceGroup().location]",
-        "properties": {}
-      },
-      {
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
             "name": "appsettings",
@@ -318,13 +318,13 @@
             "type": "string",
             "value": "[variables('functionAppName')]"
         },
-      "Azure Function Host Code": {
-        "type": "string",
-        "value": "[listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
-      },
-      "HTTP Trigger": {
-        "type": "string",
-        "value": "[concat('https://',variables('functionAppName'),'.azurewebsites.net/api/init-accelerator?code=',listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]"
-      }
+        "Azure Function Host Code": {
+            "type": "string",
+            "value": "[listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
+        },
+        "HTTP Trigger": {
+            "type": "string",
+            "value": "[concat('https://',variables('functionAppName'),'.azurewebsites.net/api/init-accelerator?code=',listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]"
+        }
     }
 }
