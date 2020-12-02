@@ -1,0 +1,40 @@
+{
+    "name": "{{indexer-name}}",
+    "targetIndexName": "{{index-name}}",
+    "dataSourceName": "{{datasource-name}}",
+    "skillsetName": "{{skillset-name}}",
+    "disabled": false,
+    "parameters": {
+        "batchSize": 10,
+        "maxFailedItems": -1,
+        "maxFailedItemsPerBatch": -1,
+        "configuration": {
+            "indexedFileNameExtensions": ".pdf,.docx,.doc,.xlsx,.xls,.html,.rtf,.txt,.tsv"
+        }
+    },
+    "fieldMappings" : [
+        {
+            "sourceFieldName": "metadata_storage_path",
+            "targetFieldName": "metadata_storage_path"
+        },
+        {
+            "sourceFieldName" : "metadata_storage_path",
+            "targetFieldName" : "id",
+            "mappingFunction" : { "name" : "base64Encode" }
+        },
+        {
+        	"sourceFieldName": "metadata_storage_name",
+        	"targetFieldName": "metadata_storage_name"
+        }
+   ],
+    "outputFieldMappings": [
+        {
+            "sourceFieldName": "/document/content",
+            "targetFieldName": "content"
+        },
+        {
+            "sourceFieldName": "/document/status",
+            "targetFieldName": "status"
+        }
+    ]
+}
