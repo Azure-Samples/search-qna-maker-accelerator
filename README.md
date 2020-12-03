@@ -54,7 +54,7 @@ Open up a new browser tab and paste the URL into the browser. This will run for 
 
 Navigate to the storage account in the resource group you just created. Find the container named `qna-container` and upload your documents into the container.
 
-### 5. Set up the UI
+### 4. Set up the UI
 
 With the search index created, you're ready to spin up the UI to start searching! The UI is a React based [Azure Static Web App](https://azure.microsoft.com/services/app-service/static/) available in the `SearchUI` folder.
 
