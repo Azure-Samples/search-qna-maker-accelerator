@@ -176,6 +176,7 @@
             "kind": "functionapp",
             "location": "[resourceGroup().location]",
             "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
                 "[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
                 "[resourceId('Microsoft.CognitiveServices/accounts', variables('qnaServiceName'))]"
@@ -184,7 +185,9 @@
                 "name": "[variables('functionAppName')]",
                 "kind": "functionapp",
                 "httpsOnly": true,
+                "serverFarmId": "[concat('/subscriptions/', subscription().SubscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
                 "siteConfig": {
+                    "alwaysOn": true,
                     "appSettings": [
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",

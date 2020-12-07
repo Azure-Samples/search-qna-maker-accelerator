@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -26,6 +27,16 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 {
     public static class UploadToQnAMaker
     {
+        private static HttpClient httpClient = new HttpClient();
+        private static Dictionary<string, int> FileTypeToSizeLimitInQnAMaker = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+                                                                            {
+                                                                                { "txt", Constants.MaxTextFileSizeInMb * 1024 },
+                                                                                { "tsv", Constants.MaxTextFileSizeInMb * 1024 },
+                                                                                { "pdf", Constants.MaxPdfFileSizeInMb * 1024 },
+                                                                                { "xlsx", Constants.MaxExcelFileSizeInMb * 1024 },
+                                                                                { "docx", Constants.MaxDocFileSizeInMb * 1024 },
+                                                                            };
+
         [FunctionName("upload-to-qna")]
         public static IActionResult RunUploadToQnaMaker(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
@@ -49,6 +60,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                     string blobName = (inRecord.Data.TryGetValue("blobName", out object blobNameObject) ? blobNameObject : null) as string;
                     string blobUrl = (inRecord.Data.TryGetValue("blobUrl", out object blobUrlObject) ? blobUrlObject : null) as string;
                     string sasToken = (inRecord.Data.TryGetValue("sasToken", out object sasTokenObject) ? sasTokenObject : null) as string;
+                    long blobSizeInKB = (inRecord.Data.TryGetValue("blobSize", out object blobSizeObject) ? (long)blobSizeObject : 0)/1024;
 
                     if (string.IsNullOrWhiteSpace(blobUrl))
                     {
@@ -57,19 +69,29 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                     }
 
                     string fileUri = WebApiSkillHelpers.CombineSasTokenWithUri(blobUrl, sasToken);
-                    var queueMessage = new QnAQueueMessage
+
+                    log.LogInformation("file: " + blobName + " size from indexer: " + blobSizeInKB);
+                    if (!IsValidFile(blobName, blobSizeInKB))
                     {
-                        Id = id,
-                        FileName = blobName,
-                        FileUri = fileUri
-                    };
-                    msgBatch.Values.Add(queueMessage);
-                    if (msgBatch.Values.Count >= 10)
-                    {
-                        msg.Add(msgBatch);
-                        msgBatch.Values.Clear();
+                        log.LogWarning("upload-to-qna-queue-trigger: unable to extract qnas from this file " + blobName + " of size " + blobSizeInKB);
+                        outRecord.Data["status"] = "Failed";
                     }
-                    outRecord.Data["status"] = "InQueue";
+                    else
+                    {
+                        var queueMessage = new QnAQueueMessage
+                        {
+                            Id = id,
+                            FileName = blobName,
+                            FileUri = fileUri
+                        };
+                        msgBatch.Values.Add(queueMessage);
+                        if (msgBatch.Values.Count >= 10)
+                        {
+                            msg.Add(msgBatch);
+                            msgBatch.Values.Clear();
+                        }
+                        outRecord.Data["status"] = "InQueue";
+                    }
                     return outRecord;
                 });
             // Add a list of <= 10 files into one queue message to be extracted as a batch. 
@@ -96,12 +118,6 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             var indexDocuments = new List<IndexDocument>();
             foreach (var msg in qnaQueueMessage.Values)
             {
-                if (!IsValidFile(msg.FileName))
-                {
-                    log.LogError("upload-to-qna-queue-trigger: unable to extract qnas from this file extension " + msg.FileName);
-                    indexDocuments.Add(new IndexDocument { id = msg.Id, status = OperationStateType.Failed});
-                    continue;
-                }
                 updateKB.Delete.Sources.Add(msg.FileName);
                 updateKB.Add.Files.Add(new FileDTO { FileName = msg.FileName, FileUri = msg.FileUri });
                 indexDocuments.Add(new IndexDocument { id = msg.Id });
@@ -128,7 +144,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             // TODO check to make sure this already exists in the index i.e. the indexer has finished indexed this id
             // so that the indexer doesn't overwrite this status with the InQueue status (avoid race condition with indexer)
             await searchClient.MergeOrUploadDocumentsAsync(indexDocuments);
-
+            
             await qnaClient.Knowledgebase.PublishAsync(GetAppSetting("KnowledgeBaseID"));
         }
 
@@ -136,6 +152,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
         {
             var service = "/qnamaker/v4.0";
             string uri = qnaClient.Endpoint + service + "/knowledgebases/" + GetAppSetting("KnowledgeBaseID");
+            var dummyOperation = new Operation(operationState: OperationStateType.Failed);
 
             string content = JsonConvert.SerializeObject(updateKB);
             // To speed up extraction within one batch request and to skip sources that have extraction failure
@@ -144,6 +161,12 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
             // Starts the QnA Maker operation to update the knowledge base
             var response = await Patch(uri, GetAppSetting("QnAAuthoringKey"), content);
+
+            if (response.statusCode != HttpStatusCode.Accepted.ToString())
+            {
+                log.LogError("Error while sending update KB request: " + response.response);
+                return dummyOperation;
+            }
             var fields = JsonConvert.DeserializeObject<Dictionary<string, string>>(response.response);
             string opId = fields["operationId"];
             // Get operation status
@@ -153,7 +176,6 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
         private static async Task<Response> Patch(string uri, string key, string body)
         {
-            using (var client = new HttpClient())
             using (var request = new HttpRequestMessage())
             {
                 request.Method = HttpMethod.Patch;
@@ -166,7 +188,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 
                 request.Headers.Add("Ocp-Apim-Subscription-Key", $"{key}");
 
-                var response = await client.SendAsync(request);
+                var response = await httpClient.SendAsync(request);
                 var responseBody = await response.Content.ReadAsStringAsync();
                 return new Response(response, response.Headers, responseBody);
             }
@@ -176,8 +198,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
         private static async Task<Operation> MonitorOperation(IQnAMakerClient qnaClient, Operation operation, ILogger log)
         {
             // Loop while operation is running
-            for (int i = 0;
-                i < 100 && (operation.OperationState == OperationStateType.NotStarted || operation.OperationState == OperationStateType.Running);
+            for (int i = 0; operation.OperationState == OperationStateType.NotStarted || operation.OperationState == OperationStateType.Running;
                 i++)
             {
                 log.LogInformation($"Waiting for operation: {operation.OperationId} to complete.");
@@ -189,36 +210,43 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
         // </MonitorOperation>
 
         // Checks valid file type before sending for extraction
-        private static bool IsValidFile(string fileName)
+        private static bool IsValidFile(string fileName, long fileSizeInKBs)
         {
-            HashSet<string> fileExtensions = new HashSet<string> { "tsv", "pdf", "txt", "docx", "xlsx" };
-            string fileExtension;
-            try
+        var fileExtension = Path.GetExtension(fileName)?.ToLower()?.TrimStart('.');
+            if (FileTypeToSizeLimitInQnAMaker.TryGetValue(fileExtension, out var szLimitInKb)
+                    && fileSizeInKBs <= szLimitInKb)
             {
-                fileExtension = Path.GetExtension(fileName).ToLower().TrimStart('.');
+                return true;
             }
-            catch
-            {
-                fileExtension = string.Empty;
-            }
-            
-            return fileExtensions.Contains(fileExtension);
+            return false;
         }
 
         // Returns the operation state after extraction for fileName
         private static string GetOperationStatus(Operation operation, string fileName, ILogger log)
         {
             string operationState = OperationStateType.Succeeded;
-            if (operation.OperationState != OperationStateType.Succeeded && operation.ErrorResponse != null)
+            if (operation.OperationState == OperationStateType.Succeeded)
             {
-                // Checks if the fileName is present in the error response
-                var error = operation.ErrorResponse.Error.Details.Where(error => error.Target == fileName);
-                if(error != null && error.Any())
+                operationState = OperationStateType.Succeeded;
+            }
+            else if (operation.OperationState == OperationStateType.Failed)
+            {
+                operationState = OperationStateType.Failed;
+                log.LogError("upload-to-qna-queue-trigger: operation failed " + operation?.ErrorResponse?.Error.Message);
+            }
+            else
+            {
+                if (operation.ErrorResponse?.Error?.Details != null)
                 {
-                    // Gets error details correspoding to the fileName if it exists 
-                    var errorDetails = error.ToList().First();
-                    log.LogError("upload-to-qna-queue-trigger: " + errorDetails.Message + " " + errorDetails.Target);
-                    operationState = OperationStateType.Failed;
+                    // Checks if the fileName is present in the error response
+                    var error = operation.ErrorResponse.Error.Details.Where(error => error.Target == fileName);
+                    if (error != null && error.Any())
+                    {
+                        // Gets error details correspoding to the fileName if it exists 
+                        var errorDetails = error.ToList().First();
+                        log.LogError("upload-to-qna-queue-trigger: " + errorDetails.Message + " " + errorDetails.Target);
+                        operationState = OperationStateType.Failed;
+                    }
                 }
             }
 
