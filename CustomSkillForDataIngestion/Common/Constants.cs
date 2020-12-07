@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Common
+﻿namespace Common
 {
     public class Constants
     {

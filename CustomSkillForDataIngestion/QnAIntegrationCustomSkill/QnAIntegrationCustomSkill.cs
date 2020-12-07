@@ -60,7 +60,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                     string blobName = (inRecord.Data.TryGetValue("blobName", out object blobNameObject) ? blobNameObject : null) as string;
                     string blobUrl = (inRecord.Data.TryGetValue("blobUrl", out object blobUrlObject) ? blobUrlObject : null) as string;
                     string sasToken = (inRecord.Data.TryGetValue("sasToken", out object sasTokenObject) ? sasTokenObject : null) as string;
-                    long blobSizeInKB = (inRecord.Data.TryGetValue("blobSize", out object blobSizeObject) ? (long)blobSizeObject : 0)/1024;
+                    long blobSizeInKBs = (inRecord.Data.TryGetValue("blobSize", out object blobSizeObject) ? (long)blobSizeObject : 0)/1024;
 
                     if (string.IsNullOrWhiteSpace(blobUrl))
                     {
@@ -70,10 +70,9 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
                     string fileUri = WebApiSkillHelpers.CombineSasTokenWithUri(blobUrl, sasToken);
 
-                    log.LogInformation("file: " + blobName + " size from indexer: " + blobSizeInKB);
-                    if (!IsValidFile(blobName, blobSizeInKB))
+                    if (!IsValidFile(blobName, blobSizeInKBs))
                     {
-                        log.LogWarning("upload-to-qna-queue-trigger: unable to extract qnas from this file " + blobName + " of size " + blobSizeInKB);
+                        log.LogError("upload-to-qna-queue-trigger: unable to extract qnas from this file " + blobName + " of size " + blobSizeInKBs);
                         outRecord.Data["status"] = "Failed";
                     }
                     else
@@ -144,7 +143,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             // TODO check to make sure this already exists in the index i.e. the indexer has finished indexed this id
             // so that the indexer doesn't overwrite this status with the InQueue status (avoid race condition with indexer)
             await searchClient.MergeOrUploadDocumentsAsync(indexDocuments);
-            
+
             await qnaClient.Knowledgebase.PublishAsync(GetAppSetting("KnowledgeBaseID"));
         }
 
@@ -212,7 +211,8 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
         // Checks valid file type before sending for extraction
         private static bool IsValidFile(string fileName, long fileSizeInKBs)
         {
-        var fileExtension = Path.GetExtension(fileName)?.ToLower()?.TrimStart('.');
+            var fileExtension = Path.GetExtension(fileName)?.ToLower()?.TrimStart('.');
+            // Prior file type and size validation for QnA Maker
             if (FileTypeToSizeLimitInQnAMaker.TryGetValue(fileExtension, out var szLimitInKb)
                     && fileSizeInKBs <= szLimitInKb)
             {
