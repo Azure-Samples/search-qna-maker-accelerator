@@ -40,25 +40,27 @@ export default function SearchBar(props) {
     }
 
     useEffect(_ =>{
-        
-        const body = {
-            q: q,
-            top: 5,
-            suggester: 'sg'
-        };
+        const timer = setTimeout(() => {
+            const body = {
+                q: q,
+                top: 5,
+                suggester: 'sg'
+            };
 
-        if (q === '') {
-            setSuggestions([]);
-        } else {
-            axios.post( '/api/suggest', body)
-            .then( response => {
-                setSuggestions(response.data.suggestions);
-            } )
-            .catch(error => {
-                console.log(error);
+            if (q === '') {
                 setSuggestions([]);
-            });
-        }
+            } else {
+                axios.post( '/api/suggest', body)
+                .then( response => {
+                    setSuggestions(response.data.suggestions);
+                } )
+                .catch(error => {
+                    console.log(error);
+                    setSuggestions([]);
+                });
+            }
+        }, 300);
+        return () => clearTimeout(timer);
     }, [q, props]);
 
     var suggestionDiv;
