@@ -32,10 +32,12 @@ export default function Search() {
     setIsLoading(true);
     setSkip((currentPage - 1) * top);
     const body = {
-      q: removeStopwords(q),
+      q: q,
       top: top,
       skip: skip,
-      filters: filters
+      filters: filters,
+      // only return answer on first page
+      getAnswer: currentPage === 1 ? true : false 
     };
 
     axios.post('/api/search', body)
@@ -43,6 +45,10 @@ export default function Search() {
         setResults(response.data.results);
         setFacets(response.data.facets);
         setResultCount(response.data.count);
+
+        if (currentPage === 1) {
+          setAnswer(response.data.answers[0]);
+        }
         setIsLoading(false);
       })
       .catch(error => {
@@ -50,7 +56,8 @@ export default function Search() {
         setIsLoading(false);
       });
 
-  }, [q, top, skip, filters, currentPage]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [top, skip, filters, currentPage]);
 
   // pushing the new search term to history when q is updated
   // allows the back button to work as expected when coming back from the details page
@@ -58,19 +65,7 @@ export default function Search() {
     history.push('/search?q=' + q);
     setCurrentPage(1);
     setFilters([]);
-    const body = {
-      q: q
-    };
 
-    axios.post('/api/answer', body)
-      .then(response => {
-
-        setAnswer(response.data.answers[0]);
-      })
-      .catch(error => {
-        console.log(error);
-        setIsLoading(false);
-      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
 
@@ -80,26 +75,7 @@ export default function Search() {
     setQ(searchTerm);
   }
 
-  let removeStopwords = (q) => {
-    const stopWords = ["a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "aren't", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't", "cannot", "could", "couldn't", "did",
-      "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during", "each", "few", "for", "from", "further", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he'd", "he'll", "he's", "her", "here", "here's", "hers", "herself",
-      "him", "himself", "his", "how", "how's", "i", "i'd", "i'll", "i'm", "i've", "if", "in", "into", "is", "isn't", "it", "it's", "its", "itself", "let's", "me", "more", "most", "mustn't", "my", "myself", "no", "nor", "not", "of", "off", "on", "once", "only",
-      "or", "other", "ought", "our", "ours", "ourselves", "out", "over", "own", "same", "shan't", "she", "she'd", "she'll", "she's", "should", "shouldn't", "so", "some", "such", "than", "that", "that's", "the", "their", "theirs", "them", "themselves", "then",
-      "there", "there's", "these", "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too", "under", "until", "up", "very", "was", "wasn't", "we", "we'd", "we'll", "we're", "we've", "were", "weren't", "what", "what's", "when",
-      "when's", "where", "where's", "which", "while", "who", "who's", "whom", "why", "why's", "with", "won't", "would", "wouldn't", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"];
 
-    let words = q.toLowerCase().split(' ');
-
-    var i;
-    var output = [];
-    for (i = 0; i < words.length; i++) {
-      if (stopWords.indexOf(words[i].trim()) < 0 ) {
-        output.push(words[i]);
-      }
-    }
-
-    return output.join(" ");
-  }
 
   var body;
   if (isLoading) {
