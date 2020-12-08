@@ -163,7 +163,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
             if (response.statusCode != HttpStatusCode.Accepted.ToString())
             {
-                log.LogError("Error while sending update KB request: " + response.response);
+                log.LogError("Error while sending update KB request: " + response.response + ", status code: " + response.statusCode);
                 return dummyOperation;
             }
             var fields = JsonConvert.DeserializeObject<Dictionary<string, string>>(response.response);
@@ -223,19 +223,19 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
         // Returns the operation state after extraction for fileName
         private static string GetOperationStatus(Operation operation, string fileName, ILogger log)
-        {
-            string operationState = OperationStateType.Succeeded;
+        {          
             if (operation.OperationState == OperationStateType.Succeeded)
             {
-                operationState = OperationStateType.Succeeded;
+                return OperationStateType.Succeeded;
             }
             else if (operation.OperationState == OperationStateType.Failed)
             {
-                operationState = OperationStateType.Failed;
-                log.LogError("upload-to-qna-queue-trigger: operation failed " + operation?.ErrorResponse?.Error.Message);
+                log.LogError("upload-to-qna-queue-trigger: operation failed " + operation?.ErrorResponse?.Error.Message + " for file " + fileName);
+                return OperationStateType.Failed;
             }
             else
             {
+                string operationState = OperationStateType.Succeeded;
                 if (operation.ErrorResponse?.Error?.Details != null)
                 {
                     // Checks if the fileName is present in the error response
@@ -248,9 +248,8 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                         operationState = OperationStateType.Failed;
                     }
                 }
-            }
-
-            return operationState;
+                return operationState;
+            }           
         }
 
         private static UpdateKbOperationDTO InitUpdateKB()
