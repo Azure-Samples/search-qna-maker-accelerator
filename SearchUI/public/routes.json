@@ -30,40 +30,31 @@
         "statusCode": 301
       },
       { 
-        "route": "/search", 
-        "allowedRoles": ["authenticated"]
+        "route": "/search"
       },
       { 
-        "route": "/upload", 
-        "allowedRoles": ["authenticated"] 
+        "route": "/upload"
       },
       { 
-        "route": "/api/search", 
-        "allowedRoles": ["authenticated"] 
+        "route": "/api/search"
       },
       { 
-        "route": "/api/lookup", 
-        "allowedRoles": ["authenticated"] 
+        "route": "/api/lookup"
       },
       { 
-        "route": "/api/suggest", 
-        "allowedRoles": ["authenticated"] 
+        "route": "/api/suggest"
       },
       { 
-        "route": "/api/upload", 
-        "allowedRoles": ["authenticated"] 
+        "route": "/api/upload"
       },
       { 
-        "route": "/api/getKb", 
-        "allowedRoles": ["authenticated"] 
+        "route": "/api/getKb"
       },
       { 
-        "route": "/api/answer", 
-        "allowedRoles": ["authenticated"] 
+        "route": "/api/answer"
       },
       { 
-        "route": "/details/*", 
-        "allowedRoles": ["authenticated"] 
+        "route": "/details/*"
       },
       {
         "route": "/*",
