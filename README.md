@@ -14,6 +14,12 @@ This solution accelerator contains the following artifacts:
 + Custom skill in Cognitive Search, which ingests the data into QnA Maker
 + User interface to view the results
 
+## Live demo
+
+You can view a live demo of this repo at the following link:
+
+[https://ambitious-tree-00baa321e.azurestaticapps.net](https://ambitious-tree-00baa321e.azurestaticapps.net)
+
 ## Prerequisites
 
 + A GitHub account
@@ -25,48 +31,30 @@ This solution accelerator contains the following artifacts:
 
 ### 1. Deploy Resources
 
-The services and components needed for the solution are packaged in the [ARM template](./azuredeploy.json). Click the **Deploy to Azure** button to get started. 
+The services and components needed for the solution are packaged in the repo's [ARM template](./azuredeploy.json). Click the **Deploy to Azure** button to get started. 
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fjennifermarsman%2Fcognitive-search-qna-solution%2Fmain%2Fazuredeploy.json)
 
-The following resources will be deployed:
-
-1. Azure Cognitive Search
-2. QnA Maker Cognitive Service
-3. Azure App Service, App Service Plan
-4. Azure App Service, Website
-5. Storage Account
-6. Azure Function App
-7. Cognitive Services All-in-one resource
-
-Once the deployment finishes, navigate over to the **Outputs** tab to get the names and keys of your services. You'll use these values in step #4.
+The deployment may take several minutes. Once the deployment finishes, navigate over to the **Outputs** tab:
 
 ![Deployment screenshot](./images/deployment.png)
 
+Copy the value of the HTTP Trigger. You'll use this value in the next step.
 
-### 2. Create a Knowledge Base
+![URL to copy](./images/qna-copy-url.png)
 
-Create a knowledge base in your newly deployed QnAMaker instance at [https://www.qnamaker.ai/](https://www.qnamaker.ai/). Don't add any data to it or publish it yet.
 
-1. Grab the id for the knowledge base from the url, it will look something like this "https://www.qnamaker.ai/Edit/KnowledgeBase? kbId=**KnowledgeBaseID**&tenantId=**TenantId**" where you want the **KnowledgeBaseID**.
-2. [Add an application setting](https://docs.microsoft.com/en-us/azure/azure-functions/functions-how-to-use-azure-function-app-settings#portal) for the deployed function instance called "KnowledgeBaseID" with the value of the knowledge id you just grabbed.
-3. Make sure to save (say yes to it being ok to restart the function).
+### 2. Initialize the solution
+
+Open up a new browser tab and paste the URL into the browser. This will run for about a minute and then you'll see a message indicating success or failure.
+
+![Initalize solution accelerator](./images/initialize-accelerator.png)
 
 ### 3. Upload documents
 
-Create a new blob container with name that you specified in the Postman variables in the deployed storage account, and copy your data files into it.
+Navigate to the storage account in the resource group you just created. Find the container named `qna-container` and upload your documents into the container.
 
-### 4. Create a search index
-
-The next step is to create the search index. A [Postman](https://www.postman.com/downloads/) collection and environment are included in the repo to make it easy to create a search index that incorporates the QnA Maker custom skill.
-
-**Collection**: `CogSearch - Qna.postman_collection.json`
-
-**Environment**: `CogSearch - Qna Env.postman_environment.json`
-
-Navigate to [**Creade-Index-Postman.md**](./Create-Index-Postman.md) for full details on how to create the search index.
-
-### 5. Set up the UI
+### 4. Set up the UI
 
 With the search index created, you're ready to spin up the UI to start searching! The UI is a React based [Azure Static Web App](https://azure.microsoft.com/services/app-service/static/) available in the `SearchUI` folder.
 
@@ -75,7 +63,6 @@ Navigate to [**SearchUI/README.md**](search-ui/README.md) for full details on ho
 Within a few minutes, you'll have a UI with a search experience that looks like this:
 
 ![Screenshot of sample web app](./images/search-results.png)
-
 
 ## Data
 The data we used to test with [can be found here](https://github.com/JerryWei03/COVID-Q/tree/master/data/PDFs) if you want to reuse it.  Some of these files consistently fail upload to QnAMaker for reasons unknown to me. Make sure if we end up using this for the final demo that [we reference the author](https://github.com/JerryWei03/COVID-Q#citation) and verify the licensing as appropriate.
