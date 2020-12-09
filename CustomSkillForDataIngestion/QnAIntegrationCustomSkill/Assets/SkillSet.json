@@ -28,6 +28,10 @@
                 {
                     "name": "sasToken",
                     "source": "/document/metadata_storage_sas_token"
+                },
+                {
+                  "name": "blobSize",
+                  "source":  "/document/metadata_storage_size"
                 }
             ],
             "outputs": [
