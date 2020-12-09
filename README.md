@@ -7,12 +7,14 @@ This solution accelerator leverages the power of Azure Cognitive Search together
 
 Ordinarily, Azure Cognitive Search returns the most relevant documents for your search query but together with QnA Maker integration, it can not only find the most relevant documents but also pull questions and answers out of the document and suggest the most relevant answers.  
 
-Please note that not all documents support the [question/answer format required by QnA Maker](https://docs.microsoft.com/azure/cognitive-services/qnamaker/concepts/data-sources-and-content#file-and-url-data-types).  
+Please note that not all documents support the [question/answer format required by QnA Maker](https://docs.microsoft.com/azure/cognitive-services/qnamaker/concepts/data-sources-and-content#file-and-url-data-types).  By default, the logic in the Search service indexer also ingests only the following file types: `.pdf,.docx,.doc,.xlsx,.xls,.html,.rtf,.txt,.tsv`.  You can change this by modifying the `indexedFileNameExtensions` property in the [Indexer.json](./CustomSkillForDataIngestion/QnAIntegrationCustomSkill/Assets/Indexer.json).  
 
 This solution accelerator contains the following artifacts:
 + ARM template to set up the solution
 + Custom skill in Cognitive Search, which ingests the data into QnA Maker
 + User interface to view the results
+
+![Cognitive Search QnA Maker Solution Architecture](./images/CogSearchQnAMakerArchitecture.jpg)
 
 ## Live demo
 
@@ -34,7 +36,7 @@ You can view a live demo of this repo at the following link:
 The services and components needed for the solution are packaged in the repo's [ARM template](./azuredeploy.json). The following resources will be deployed:
 
 1. Azure Cognitive Search
-2. QnA Maker Cognitive Service
+2. QnA Maker Cognitive Service (this will always be deployed to the West US region, but your data is not stored here - see [here](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/concepts/azure-resources?tabs=v1#management-service-region))
 3. Azure App Service, App Service Plan
 4. Azure App Service, Website
 5. Storage Account
@@ -63,6 +65,13 @@ Open up a new browser tab and paste the URL into the browser. This will run for 
 ### 3. Upload documents
 
 Navigate to the storage account in the resource group you just created. Find the container named `qna-container` and upload your documents into the container.
+
+___
+> NOTE: if you would prefer to pull data from a different, pre-existing blob storage account, you may instead change the data source in your Search service to point to a container in a different blob storage account.  Just change the connection string and container name in the data source in the Search service.  
+___
+
+After uploading your data to `qna-container` **or** changing your data source, you will need to reset and then re-run your indexer in the Search service to ingest your new data.  
+
 
 ### 4. Set up the UI
 
