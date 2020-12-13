@@ -15,7 +15,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net/api/init-kb?code=',listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]",
+                    "uri": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net/api/init-accelerator?code=',listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {}
