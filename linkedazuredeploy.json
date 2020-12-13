@@ -25,7 +25,7 @@
     "outputs": {
         "Status": {
             "type": "string",
-            "value": "[reference('initialze').outputs.Status.value]"
+            "value": "[reference('initialize').outputs.Status.value]"
         }
     }
 }
