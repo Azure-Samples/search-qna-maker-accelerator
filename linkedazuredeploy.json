@@ -11,7 +11,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
-            "name": "initaccelerator",
+            "name": "initialize",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -25,7 +25,7 @@
     "outputs": {
         "Status": {
             "type": "string",
-            "value": "[reference('initaccelerator').outputs.Status.value]"
+            "value": "[reference('initialze').outputs.Status.value]"
         }
     }
 }

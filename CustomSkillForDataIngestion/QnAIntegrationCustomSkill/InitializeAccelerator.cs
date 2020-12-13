@@ -17,7 +17,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-
 namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 {
     public static class InitializeAccelerator
@@ -30,11 +29,12 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             ILogger log, ExecutionContext executionContext)
         {
             var storageConnectionString = GetAppSetting("AzureWebJobsStorage");
-            Microsoft.Extensions.Primitives.StringValues functionCode;
-            var result = req.Headers.TryGetValue("x-functions-key", out functionCode);
+            string functionCode;
+            var queryStrings = req.GetQueryParameterDictionary();
+            queryStrings.TryGetValue("code", out functionCode);
             var searchServiceEndpoint = $"https://{GetAppSetting("SearchServiceName")}.search.windows.net/";
             var basePath = Path.Join(executionContext.FunctionAppDirectory, "Assets");
-            string responseMessage, response;
+            string responseMessage, responseARM;
 
             try
             {
@@ -54,9 +54,10 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             using (StreamReader r = new StreamReader(path))
             {
                 var body = r.ReadToEnd();
-                response = body.Replace("{{status}}", responseMessage);
+                responseARM = body.Replace("{{status}}", responseMessage);
             }
-            return new OkObjectResult(response);
+            log.LogInformation(responseARM);
+            return new OkObjectResult(responseARM);
         }
 
         private static async Task CreateContainer(string connectionString, ILogger log)
@@ -66,7 +67,8 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 log.LogInformation("init-accelerator: Creating container " + Constants.containerName);
 
                 BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-                BlobContainerClient containerClient = await blobServiceClient.CreateBlobContainerAsync(Constants.containerName);
+                await blobServiceClient.CreateBlobContainerAsync(Constants.containerName);
+                await blobServiceClient.CreateBlobContainerAsync(Constants.kbContainerName);
             }
             catch (Exception e)
             {
@@ -145,7 +147,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 {
                     var body = r.ReadToEnd();
                     body = body.Replace("{{skillset-name}}", Constants.skillSetName);
-                    body = body.Replace("{{function-name}}", GetAppSetting("functionAppName"));
+                    body = body.Replace("{{function-name}}", GetAppSetting("FunctionAppName"));
                     body = body.Replace("{{function-code}}", functionCode);
                     body = body.Replace("{{cog-svc-allinone-key}}", GetAppSetting("CogServicesKey"));
 

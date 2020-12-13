@@ -275,6 +275,14 @@
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                             "value": "[reference(resourceId('microsoft.insights/components', variables('appInsightsName')), '2020-02-02-preview').InstrumentationKey]"
+                        },
+                        {
+                            "name": "FunctionAppName",
+                            "value": "[variables('functionAppName')]"
+                        },
+                        {
+                            "name": "CogServicesKey",
+                            "value": "[listkeys(resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAllInOneName')), '2017-04-18').key1]"
                         }
                     ]
                 }
