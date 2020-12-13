@@ -41,6 +41,27 @@
             "metadata": {
                 "description": "Storage Account type"
             }
+        },
+        "serverFarmsSku": {
+            "defaultValue": "S1",
+            "allowedValues": [
+                "F1",
+                "D1",
+                "B1",
+                "B2",
+                "B3",
+                "S1",
+                "S2",
+                "S3",
+                "P1",
+                "P2",
+                "P3",
+                "P4"
+            ],
+            "type": "String",
+            "metadata": {
+                "description": "The SKU of the app service hosting plan"
+            }
         }
     },
     "variables": {
@@ -53,7 +74,8 @@
         "qnaAppServiceName": "[concat(parameters('resourcePrefix'), '-site-', uniqueString(resourceGroup().id, deployment().name))]",
         "storageAccountName": "[concat(parameters('resourcePrefix'), 'storage', uniqueString(resourceGroup().id, deployment().name))]",
         "functionAppName": "[concat(parameters('resourcePrefix'), '-function-app-', uniqueString(resourceGroup().id, deployment().name))]",
-        "cognitiveServicesAllInOneName": "[concat(parameters('resourcePrefix'), '-cogsvc-', uniqueString(resourceGroup().id, deployment().name))]"
+        "cognitiveServicesAllInOneName": "[concat(parameters('resourcePrefix'), '-cogsvc-allinone-', uniqueString(resourceGroup().id, deployment().name))]",
+        "appInsightsName": "[concat(parameters('resourcePrefix'), '-insights-', uniqueString(resourceGroup().id, deployment().name))]"
     },
     "resources": [
         {
@@ -96,8 +118,7 @@
             "name": "[variables('hostingPlanName')]",
             "location": "[resourceGroup().location]",
             "sku": {
-                "Tier": "Standard",
-                "Name": "S1"
+                "Name": "[parameters('serverFarmsSku')]"
             },
             "properties": {
                 "name": "[variables('hostingPlanName')]",
@@ -108,13 +129,27 @@
             }
         },
         {
+            "type": "microsoft.insights/components",
+            "apiVersion": "2020-02-02-preview",
+            "name": "[variables('appInsightsName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('appInsightsName')))]": "Resource"
+            },
+            "properties": {
+                "ApplicationId": "[variables('appInsightsName')]",
+                "Request_Source": "IbizaWebAppExtensionCreate"
+            }
+        },
+        {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2019-08-01",
             "name": "[variables('qnaAppServiceName')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
-                "[resourceId('Microsoft.Search/searchServices/', variables('searchServiceName'))]"
+                "[resourceId('Microsoft.Search/searchServices/', variables('searchServiceName'))]",
+                "[resourceId('microsoft.insights/components',variables('appInsightsName'))]"
             ],
             "tags": {
                 "[concat('hidden-related:', '/subscriptions/', subscription().SubscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]": "empty"
@@ -127,6 +162,7 @@
                             "*"
                         ]
                     },
+                    "alwaysOn": true,
                     "appSettings": [
                         {
                             "name": "AzureSearchName",
@@ -151,6 +187,10 @@
                         {
                             "name": "QNAMAKER_EXTENSION_VERSION",
                             "value": "latest"
+                        },
+                        {
+                            "name": "UserAppInsightsKey",
+                            "value": "[reference(resourceId('microsoft.insights/components', variables('appInsightsName')), '2020-02-02-preview').InstrumentationKey]"
                         }
                     ]
                 },
@@ -174,29 +214,24 @@
             "name": "[variables('functionAppName')]",
             "type": "Microsoft.Web/sites",
             "kind": "functionapp",
-            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
                 "[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
-                "[resourceId('Microsoft.CognitiveServices/accounts', variables('qnaServiceName'))]"
+                "[resourceId('Microsoft.CognitiveServices/accounts', variables('qnaServiceName'))]",
+                "[resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAllInOneName'))]",
+                "[resourceId('microsoft.insights/components',variables('appInsightsName'))]"
             ],
+            "location": "[resourceGroup().location]",
             "properties": {
                 "name": "[variables('functionAppName')]",
                 "kind": "functionapp",
                 "httpsOnly": true,
                 "serverFarmId": "[concat('/subscriptions/', subscription().SubscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
                 "siteConfig": {
+                    "enabled": true,
                     "alwaysOn": true,
                     "appSettings": [
-                        {
-                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value, ';')]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[toLower(variables('functionAppName'))]"
-                        },
                         {
                             "name": "AzureWebJobsStorage",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value, ';')]"
@@ -222,23 +257,35 @@
                             "value": "[variables('functionProject')]"
                         },
                         {
+                            "name": "SearchServiceName",
+                            "value": "[variables('searchServiceName')]"
+                        },
+                        {
+                            "name": "SearchServiceApiKey",
+                            "value": "[listAdminKeys(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), '2020-08-01').primaryKey]"
+                        },
+                        {
                             "name": "QnAServiceName",
                             "value": "[variables('qnaServiceName')]"
                         },
                         {
                             "name": "QnAAuthoringKey",
                             "value": "[listkeys(resourceId('Microsoft.CognitiveServices/accounts', variables('qnaServiceName')), '2017-04-18').key1]"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('microsoft.insights/components', variables('appInsightsName')), '2020-02-02-preview').InstrumentationKey]"
                         }
                     ]
                 }
             },
             "resources": [
                 {
+                    "type": "sourcecontrols",
                     "apiVersion": "2019-08-01",
                     "name": "web",
-                    "type": "sourcecontrols",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', variables('functionAppName'))]"
+                        "[resourceId('Microsoft.Web/Sites',variables('functionAppName'))]"
                     ],
                     "properties": {
                         "RepoUrl": "[variables('repoURL')]",
@@ -263,71 +310,28 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
-            "name": "appsettings",
+            "name": "initaccelerator",
             "dependsOn": [
-                "[resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAllInOneName'))]",
                 "[resourceId('Microsoft.Web/Sites/sourcecontrols', variables('functionAppName'), 'web')]"
             ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat('https://',variables('functionAppName'),'.azurewebsites.net/api/init-kb?code=',listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]",
+                    "uri": "[concat('https://raw.githubusercontent.com/jennifermarsman/cognitive-search-qna-solution/',variables('branch'),'/linkedazuredeploy.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "functionCode": {
-                        "value": "[listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
-                    },
                     "functionAppName": {
                         "value": "[variables('functionAppName')]"
-                    },
-                    "storageConnectionString": {
-                        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value, ';')]"
-                    },
-                    "functionProject": {
-                        "value": "[variables('functionProject')]"
-                    },
-                    "searchServiceName": {
-                        "value": "[variables('searchServiceName')]"
-                    },
-                    "qnaServiceName": {
-                        "value": "[variables('qnaServiceName')]"
-                    },
-                    "cogServicesKey": {
-                        "value": "[listkeys(resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAllInOneName')), '2017-04-18').key1]"
                     }
                 }
             }
         }
     ],
     "outputs": {
-        "Search Service Name": {
+        "Status": {
             "type": "string",
-            "value": "[variables('searchServiceName')]"
-        },
-        "Search Service Api Key": {
-            "type": "string",
-            "value": "[listAdminKeys(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), '2020-08-01').primaryKey]"
-        },
-        "Cognitive Services AllInOne Key": {
-            "type": "string",
-            "value": "[listkeys(resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAllInOneName')), '2017-04-18').key1]"
-        },
-        "Blob Storage Account Connection String": {
-            "type": "string",
-            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value, ';')]"
-        },
-        "Azure Function Name": {
-            "type": "string",
-            "value": "[variables('functionAppName')]"
-        },
-        "Azure Function Host Code": {
-            "type": "string",
-            "value": "[listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
-        },
-        "HTTP Trigger": {
-            "type": "string",
-            "value": "[concat('https://',variables('functionAppName'),'.azurewebsites.net/api/init-accelerator?code=',listkeys(concat(resourceId('Microsoft.Web/sites', variables('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]"
+            "value": "[reference('initaccelerator').outputs.Status.value]"
         }
     }
 }

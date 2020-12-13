@@ -1,0 +1,31 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "functionAppName": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "name": "initaccelerator",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net/api/init-kb?code=',listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {}
+            }
+        }
+    ],
+    "outputs": {
+        "Status": {
+            "type": "string",
+            "value": "[reference('initaccelerator').outputs.Status.value]"
+        }
+    }
+}

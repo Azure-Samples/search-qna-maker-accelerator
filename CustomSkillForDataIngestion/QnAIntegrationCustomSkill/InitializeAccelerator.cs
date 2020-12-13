@@ -30,17 +30,18 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             ILogger log, ExecutionContext executionContext)
         {
             var storageConnectionString = GetAppSetting("AzureWebJobsStorage");
-            var prefix = GetAppSetting("prefix");
+            Microsoft.Extensions.Primitives.StringValues functionCode;
+            var result = req.Headers.TryGetValue("x-functions-key", out functionCode);
             var searchServiceEndpoint = $"https://{GetAppSetting("SearchServiceName")}.search.windows.net/";
             var basePath = Path.Join(executionContext.FunctionAppDirectory, "Assets");
-            string responseMessage;
+            string responseMessage, response;
 
             try
             {
                 await CreateContainer(storageConnectionString, log);
                 await CreateDataSource(storageConnectionString, searchServiceEndpoint, basePath, log);
                 await CreateIndex(searchServiceEndpoint, log);
-                await CreateSkillSet(searchServiceEndpoint, basePath, log);
+                await CreateSkillSet(searchServiceEndpoint, basePath, functionCode, log);
                 await CreateIndexer(searchServiceEndpoint, basePath, log);
 
                 responseMessage = "Initialized accelerator successfully.";
@@ -49,40 +50,13 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             {
                 responseMessage = "Failed to initialize accelerator " + e.Message;
             }
-
-            return new OkObjectResult(responseMessage);
-        }
-
-        // returns dynamic ARM template with kbid to update configuration of the function app. 
-        [FunctionName("init-kb")]
-        public static async Task<IActionResult> initKB(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
-            ILogger log, ExecutionContext executionContext)
-        {
-            var path = Path.Join(executionContext.FunctionAppDirectory, "Assets", "AppSettingsUpdate.json");
-            var kbId = await CreateKB(log);
-            string responseARM;
+            var path = Path.Combine(basePath, "ARMTemplate.json");
             using (StreamReader r = new StreamReader(path))
             {
                 var body = r.ReadToEnd();
-                responseARM = body.Replace("{{kbId}}", kbId);
+                response = body.Replace("{{status}}", responseMessage);
             }
-            return new OkObjectResult(responseARM);
-        }
-
-        private static async Task<string> CreateKB(ILogger log)
-        {
-            var qnaClient = new QnAMakerClient(new ApiKeyServiceClientCredentials(GetAppSetting("QnAAuthoringKey")))
-            {
-                Endpoint = $"https://{GetAppSetting("QnAServiceName")}.cognitiveservices.azure.com"
-            };
-
-            var createKbDTO = new CreateKbDTO { Name = "search", Language = "English" };
-            var operation = await qnaClient.Knowledgebase.CreateAsync(createKbDTO);
-            operation = await MonitorOperation(qnaClient, operation, log);
-            var kbId = operation.ResourceLocation.Replace("/knowledgebases/", string.Empty);
-            log.LogInformation("init-kb: Created KB " + kbId);
-            return kbId;
+            return new OkObjectResult(response);
         }
 
         private static async Task CreateContainer(string connectionString, ILogger log)
@@ -160,7 +134,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             }
         }
 
-        private static async Task CreateSkillSet(string searchServiceEndpoint, string basePath, ILogger log)
+        private static async Task CreateSkillSet(string searchServiceEndpoint, string basePath, string functionCode, ILogger log)
         {
             log.LogInformation("init-accelerator: Creating Skill Set " + Constants.skillSetName);
             try
@@ -171,8 +145,8 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 {
                     var body = r.ReadToEnd();
                     body = body.Replace("{{skillset-name}}", Constants.skillSetName);
-                    body = body.Replace("{{function-name}}", GetAppSetting("WEBSITE_CONTENTSHARE"));
-                    body = body.Replace("{{function-code}}", GetAppSetting("FunctionCode"));
+                    body = body.Replace("{{function-name}}", GetAppSetting("functionAppName"));
+                    body = body.Replace("{{function-code}}", functionCode);
                     body = body.Replace("{{cog-svc-allinone-key}}", GetAppSetting("CogServicesKey"));
 
                     var response = await Put(uri, body);
@@ -224,25 +198,6 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 throw new Exception(e.Message);
             }
 
-        }
-
-        private static async Task<Operation> MonitorOperation(IQnAMakerClient qnaClient, Operation operation, ILogger log)
-        {
-            // Loop while operation is running
-            for (int i = 0;
-                i < 100 && (operation.OperationState == OperationStateType.NotStarted || operation.OperationState == OperationStateType.Running);
-                i++)
-            {
-                log.LogInformation($"Waiting for operation: {operation.OperationId} to complete.");
-                await Task.Delay(5000);
-                operation = await qnaClient.Operations.GetDetailsAsync(operation.OperationId);
-            }
-
-            if (operation.OperationState != OperationStateType.Succeeded)
-            {
-                log.LogError($"Operation {operation.OperationId} failed to completed. ErrorMessage: {operation.ErrorResponse.Error.Message}");
-            }
-            return operation;
         }
 
         private static async Task<HttpResponseMessage> Put(string uri, string body)
