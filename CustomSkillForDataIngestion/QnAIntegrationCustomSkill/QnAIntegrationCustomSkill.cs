@@ -170,12 +170,14 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             else
             {
                 kbId = await CreateKB(log);
-                MemoryStream stream = new MemoryStream();
-                StreamWriter writer = new StreamWriter(stream);
-                writer.Write(kbId);
-                writer.Flush();
-                stream.Position = 0;
-                await blobClient.UploadAsync(stream);
+                using (var stream = new MemoryStream())
+                using (var writer = new StreamWriter(stream))
+                {
+                    writer.Write(kbId);
+                    writer.Flush();
+                    stream.Position = 0;
+                    await blobClient.UploadAsync(stream);
+                }
             }
             return kbId;
         }

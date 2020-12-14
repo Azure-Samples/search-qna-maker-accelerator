@@ -66,6 +66,7 @@
     },
     "variables": {
         "repoURL": "https://github.com/jennifermarsman/cognitive-search-qna-solution",
+        "repoDirectory": "jennifermarsman/cognitive-search-qna-solution/",
         "branch": "main",
         "functionProject": "CustomSkillForDataIngestion\\QnAIntegrationCustomSkill\\QnAIntegrationCustomSkill.csproj",
         "qnaServiceName": "[concat(parameters('resourcePrefix'), '-qna-', uniqueString(resourceGroup().id, deployment().name))]",
@@ -325,7 +326,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat('https://raw.githubusercontent.com/jennifermarsman/cognitive-search-qna-solution/',variables('branch'),'/linkedazuredeploy.json')]",
+                    "uri": "[concat('https://raw.githubusercontent.com/', variables('repoDirectory'), variables('branch'),'/linkedazuredeploy.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
