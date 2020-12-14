@@ -337,9 +337,9 @@
         }
     ],
     "outputs": {
-        "Status": {
+        "HTTP Trigger": {
             "type": "string",
-            "value": "[reference('initaccelerator').outputs.Status.value]"
+            "value": "[reference('initaccelerator').outputs.URL.value]"
         }
     }
 }

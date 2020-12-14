@@ -7,25 +7,11 @@
         }
     },
     "variables": {},
-    "resources": [
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2015-01-01",
-            "name": "initialize",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net/api/init-accelerator?code=',listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {}
-            }
-        }
-    ],
+    "resources": [],
     "outputs": {
-        "Status": {
+        "URL": {
             "type": "string",
-            "value": "[reference('initialize').outputs.Status.value]"
+            "value": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net/api/init-accelerator?code=',listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]"
         }
     }
 }

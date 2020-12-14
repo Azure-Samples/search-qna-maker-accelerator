@@ -34,7 +34,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             queryStrings.TryGetValue("code", out functionCode);
             var searchServiceEndpoint = $"https://{GetAppSetting("SearchServiceName")}.search.windows.net/";
             var basePath = Path.Join(executionContext.FunctionAppDirectory, "Assets");
-            string responseMessage, responseARM;
+            string responseMessage;
 
             try
             {
@@ -50,14 +50,8 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             {
                 responseMessage = "Failed to initialize accelerator " + e.Message;
             }
-            var path = Path.Combine(basePath, "ARMTemplate.json");
-            using (StreamReader r = new StreamReader(path))
-            {
-                var body = r.ReadToEnd();
-                responseARM = body.Replace("{{status}}", responseMessage);
-            }
-            log.LogInformation(responseARM);
-            return new OkObjectResult(responseARM);
+            
+            return new OkObjectResult(responseMessage);
         }
 
         private static async Task CreateContainer(string connectionString, ILogger log)
