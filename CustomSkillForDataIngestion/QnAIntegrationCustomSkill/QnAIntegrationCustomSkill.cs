@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft. All rights reserved.  
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.  
 using Azure.Search.Documents;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using AzureCognitiveSearch.PowerSkills.Common;
 using Common;
 using Microsoft.AspNetCore.Http;
@@ -113,6 +115,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 Endpoint = $"https://{GetAppSetting("QnAServiceName")}.cognitiveservices.azure.com"
             };
 
+            string kbId = await GetKbID(log);
             var updateKB = InitUpdateKB();
             var indexDocuments = new List<IndexDocument>();
             foreach (var msg in qnaQueueMessage.Values)
@@ -125,7 +128,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             // call update KB using REST API
-            var updateOp = await UpdateKB(qnaClient, updateKB, log);
+            var updateOp = await UpdateKB(qnaClient, updateKB, kbId, log);
             updateOp = await MonitorOperation(qnaClient, updateOp, log);
             stopwatch.Stop();
             log.LogInformation("upload-to-qna-queue-trigger: update operation time = " + stopwatch.Elapsed.TotalSeconds + " seconds. Number of files processed = " + updateKB.Add.Files.Count);
@@ -144,13 +147,60 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             // so that the indexer doesn't overwrite this status with the InQueue status (avoid race condition with indexer)
             await searchClient.MergeOrUploadDocumentsAsync(indexDocuments);
 
-            await qnaClient.Knowledgebase.PublishAsync(GetAppSetting("KnowledgeBaseID"));
+            await qnaClient.Knowledgebase.PublishAsync(kbId);
+        }
+        private static async Task<string> GetKbID(ILogger log)
+        {
+            // Create a BlobServiceClient object which will be used to create a container client
+            BlobServiceClient blobServiceClient = new BlobServiceClient(GetAppSetting("AzureWebJobsStorage"));
+            string kbId = string.Empty;
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(Constants.kbContainerName);
+            BlobClient blobClient = containerClient.GetBlobClient(Constants.kbIdBlobName);
+            if (await blobClient.ExistsAsync())
+            {
+                BlobDownloadInfo download = await blobClient.DownloadAsync();
+                using (var streamReader = new StreamReader(download.Content))
+                {
+                    while (!streamReader.EndOfStream)
+                    {
+                        kbId = await streamReader.ReadLineAsync();
+                    }
+                }
+            }
+            else
+            {
+                kbId = await CreateKB(log);
+                using (var stream = new MemoryStream())
+                using (var writer = new StreamWriter(stream))
+                {
+                    writer.Write(kbId);
+                    writer.Flush();
+                    stream.Position = 0;
+                    await blobClient.UploadAsync(stream);
+                }
+            }
+            return kbId;
         }
 
-        private static async Task<Operation> UpdateKB(QnAMakerClient qnaClient, UpdateKbOperationDTO updateKB, ILogger log)
+        private static async Task<string> CreateKB(ILogger log)
+        {
+            var qnaClient = new QnAMakerClient(new ApiKeyServiceClientCredentials(GetAppSetting("QnAAuthoringKey")))
+            {
+                Endpoint = $"https://{GetAppSetting("QnAServiceName")}.cognitiveservices.azure.com"
+            };
+
+            var createKbDTO = new CreateKbDTO { Name = "search", Language = "English" };
+            var operation = await qnaClient.Knowledgebase.CreateAsync(createKbDTO);
+            operation = await MonitorOperation(qnaClient, operation, log);
+            var kbId = operation.ResourceLocation.Replace("/knowledgebases/", string.Empty);
+            log.LogInformation("init-kb: Created KB " + kbId);
+            return kbId;
+        }
+
+        private static async Task<Operation> UpdateKB(QnAMakerClient qnaClient, UpdateKbOperationDTO updateKB, string kbId, ILogger log)
         {
             var service = "/qnamaker/v4.0";
-            string uri = qnaClient.Endpoint + service + "/knowledgebases/" + GetAppSetting("KnowledgeBaseID");
+            string uri = qnaClient.Endpoint + service + "/knowledgebases/" + kbId;
             var dummyOperation = new Operation(operationState: OperationStateType.Failed);
 
             string content = JsonConvert.SerializeObject(updateKB);
