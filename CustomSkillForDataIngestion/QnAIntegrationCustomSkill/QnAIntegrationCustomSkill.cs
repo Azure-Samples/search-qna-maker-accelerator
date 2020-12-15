@@ -106,7 +106,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
         [FunctionName("upload-to-qna-queue-trigger"), Singleton]
         public async static Task Run(
             [QueueTrigger("upload-to-qna", Connection = "AzureWebJobsStorage")] QnAQueueMessageBatch qnaQueueMessage,
-            ILogger log, ExecutionContext context)
+            ILogger log)
         {
             log.LogInformation("upload-to-qna-queue-trigger: C# Queue trigger function processed");
 
@@ -115,7 +115,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 Endpoint = $"https://{GetAppSetting("QnAServiceName")}.cognitiveservices.azure.com"
             };
 
-            string kbId = await GetKbID(qnaClient, context, log);
+            string kbId = await GetKbID(qnaClient, log);
             var updateKB = InitUpdateKB();
             var indexDocuments = new List<IndexDocument>();
             foreach (var msg in qnaQueueMessage.Values)
@@ -149,11 +149,11 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
             await qnaClient.Knowledgebase.PublishAsync(kbId);
         }
-        private static async Task<string> GetKbID(QnAMakerClient qnaClient, ExecutionContext context, ILogger log)
+        private static async Task<string> GetKbID(QnAMakerClient qnaClient, ILogger log)
         {
             string kbId = string.Empty;
-            var path = Path.Join(context.FunctionAppDirectory,"..\\qnamaker");
-            var filePath = Path.Join(path, Constants.kbIdBlobName);
+            var path = Path.Join(GetAppSetting("HOME"), Constants.qnamakerFolderPath);
+            var filePath = Path.Join(path, Constants.kbIdBlobName + ".txt");
             // Check for kbid in local file system
             if (File.Exists(filePath))
             {
@@ -275,7 +275,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
         }
         // </MonitorOperation>
 
-        // Checks valid file type before sending for extraction
+        // Checks valid file type and size before sending for extraction
         private static bool IsValidFile(string fileName, long fileSizeInKBs)
         {
             var fileExtension = Path.GetExtension(fileName)?.ToLower()?.TrimStart('.');

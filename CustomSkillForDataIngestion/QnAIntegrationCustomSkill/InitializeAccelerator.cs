@@ -141,7 +141,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 {
                     var body = r.ReadToEnd();
                     body = body.Replace("{{skillset-name}}", Constants.skillSetName);
-                    body = body.Replace("{{function-name}}", GetAppSetting("FunctionAppName"));
+                    body = body.Replace("{{function-name}}", GetAppSetting("WEBSITE_SITE_NAME"));
                     body = body.Replace("{{function-code}}", functionCode);
                     body = body.Replace("{{cog-svc-allinone-key}}", GetAppSetting("CogServicesKey"));
 
