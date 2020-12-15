@@ -9,7 +9,7 @@
             "uri": "https://{{function-name}}.azurewebsites.net/api/upload-to-qna?code={{function-code}}",
             "httpMethod": "POST",
             "context": "/document",
-            "batchSize": 10,
+            "batchSize": 50,
             "timeout": "PT230S",
             "degreeOfParallelism": 1,
             "inputs": [

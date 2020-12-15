@@ -115,7 +115,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 Endpoint = $"https://{GetAppSetting("QnAServiceName")}.cognitiveservices.azure.com"
             };
 
-            string kbId = await GetKbID(log);
+            string kbId = await GetKbID(qnaClient, log);
             var updateKB = InitUpdateKB();
             var indexDocuments = new List<IndexDocument>();
             foreach (var msg in qnaQueueMessage.Values)
@@ -149,46 +149,63 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
             await qnaClient.Knowledgebase.PublishAsync(kbId);
         }
-        private static async Task<string> GetKbID(ILogger log)
+        private static async Task<string> GetKbID(QnAMakerClient qnaClient, ILogger log)
         {
-            // Create a BlobServiceClient object which will be used to create a container client
-            BlobServiceClient blobServiceClient = new BlobServiceClient(GetAppSetting("AzureWebJobsStorage"));
             string kbId = string.Empty;
-            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(Constants.kbContainerName);
-            BlobClient blobClient = containerClient.GetBlobClient(Constants.kbIdBlobName);
-            if (await blobClient.ExistsAsync())
+            var path = Path.Join(GetAppSetting("HOME"), Constants.qnamakerFolderPath);
+            var filePath = Path.Join(path, Constants.kbIdBlobName + ".txt");
+            // Check for kbid in local file system
+            if (File.Exists(filePath))
             {
-                BlobDownloadInfo download = await blobClient.DownloadAsync();
-                using (var streamReader = new StreamReader(download.Content))
-                {
-                    while (!streamReader.EndOfStream)
-                    {
-                        kbId = await streamReader.ReadLineAsync();
-                    }
-                }
+                kbId = File.ReadAllText(filePath);
             }
             else
             {
-                kbId = await CreateKB(log);
-                using (var stream = new MemoryStream())
-                using (var writer = new StreamWriter(stream))
+                BlobServiceClient blobServiceClient = new BlobServiceClient(GetAppSetting("AzureWebJobsStorage"));
+                BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(Constants.kbContainerName);
+                BlobClient kbidBlobClient = containerClient.GetBlobClient(Constants.kbIdBlobName);
+                // Check blob for kbid 
+                if (await kbidBlobClient.ExistsAsync())
                 {
-                    writer.Write(kbId);
-                    writer.Flush();
-                    stream.Position = 0;
-                    await blobClient.UploadAsync(stream);
+                    BlobDownloadInfo download = await kbidBlobClient.DownloadAsync();
+                    using (var streamReader = new StreamReader(download.Content))
+                    {
+                        while (!streamReader.EndOfStream)
+                        {
+                            kbId = await streamReader.ReadLineAsync();
+                        }
+                    }
                 }
+                else
+                {
+                    BlobClient keyBlobClient = containerClient.GetBlobClient(Constants.keyBlobName);
+                    kbId = await CreateKB(qnaClient, log);
+                    var endpointKey = await qnaClient.EndpointKeys.GetKeysAsync();
+                    // save kbid and qnamaker runtime key to blob
+                    await UploadToBlob(kbidBlobClient, kbId);
+                    await UploadToBlob(keyBlobClient, endpointKey.PrimaryEndpointKey);
+                }
+                // save kbid to local file system 
+                Directory.CreateDirectory(path);
+                File.WriteAllText(filePath, kbId);
             }
             return kbId;
         }
 
-        private static async Task<string> CreateKB(ILogger log)
+        private static async Task UploadToBlob(BlobClient blobClient, string content)
         {
-            var qnaClient = new QnAMakerClient(new ApiKeyServiceClientCredentials(GetAppSetting("QnAAuthoringKey")))
+            using (var stream = new MemoryStream())
+            using (var writer = new StreamWriter(stream))
             {
-                Endpoint = $"https://{GetAppSetting("QnAServiceName")}.cognitiveservices.azure.com"
-            };
+                writer.Write(content);
+                writer.Flush();
+                stream.Position = 0;
+                await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = "text/plain" });
+            }
+        }
 
+        private static async Task<string> CreateKB(QnAMakerClient qnaClient, ILogger log)
+        {
             var createKbDTO = new CreateKbDTO { Name = "search", Language = "English" };
             var operation = await qnaClient.Knowledgebase.CreateAsync(createKbDTO);
             operation = await MonitorOperation(qnaClient, operation, log);
@@ -258,7 +275,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
         }
         // </MonitorOperation>
 
-        // Checks valid file type before sending for extraction
+        // Checks valid file type and size before sending for extraction
         private static bool IsValidFile(string fileName, long fileSizeInKBs)
         {
             var fileExtension = Path.GetExtension(fileName)?.ToLower()?.TrimStart('.');
