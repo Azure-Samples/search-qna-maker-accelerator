@@ -14,7 +14,9 @@
 
         public const string kbContainerName = "qnamakerdata";
 
-        public const string kbIdBlobName = "kbid";
+        public const string kbIdBlobName = "kbid.txt";
+
+        public const string keyBlobName = "runtimekey.txt";
 
         public const string apiVersion = "2020-06-30";
 
