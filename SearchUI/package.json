@@ -2,7 +2,7 @@
   "name": "sample",
   "version": "0.1.0",
   "private": true,
-    "engines": {
+  "engines": {
     "node": ">=10"
   },
   "dependencies": {

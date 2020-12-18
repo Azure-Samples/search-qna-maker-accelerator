@@ -4,10 +4,69 @@
     "parameters": {
         "functionAppName": {
             "type": "string"
+        },
+        "siteName": {
+            "type": "string"
+        },
+        "hostingPlanName": {
+            "type": "string"
+        },
+        "reactProject": {
+            "type": "string"
+        },
+        "repoURL": {
+            "type": "string"
+        }
+        ,"branch": {
+            "type": "string"
         }
     },
     "variables": {},
-    "resources": [],
+    "resources": [
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2020-06-01",
+            "name": "[parameters('siteName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "properties": {
+                "serverFarmId": "[parameters('hostingPlanName')]"
+
+            },
+            "resources": [
+                {
+                    "apiVersion": "2018-11-01",
+                    "name": "appsettings",
+                    "type": "config",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+                    ],
+                    "properties": {
+                        "PROJECT": "[parameters('reactProject')]",
+                        "WEBSITE_NODE_DEFAULT_VERSION": "10.15.3",
+                        "REACT_APP_FUNCTION_URL": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net')]",
+                        "REACT_APP_FUNCTION_CODE": "[listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]",
+                        "SITE_FLAVOR": "react"
+                    }
+                },
+                {
+                    "type": "sourcecontrols",
+                    "apiVersion": "2020-06-01",
+                    "name": "web",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', parameters('siteName'))]",
+                        "[resourceId('Microsoft.Web/Sites/config', parameters('siteName'), 'appsettings')]"
+                    ],
+                    "properties": {
+                        "repoUrl": "[parameters('repoURL')]",
+                        "branch": "[parameters('branch')]",
+                        "isManualIntegration": true
+                    }
+                }
+            ]
+        }
+    ],
     "outputs": {
         "URL": {
             "type": "string",

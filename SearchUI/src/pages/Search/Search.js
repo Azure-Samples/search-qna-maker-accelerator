@@ -37,17 +37,22 @@ export default function Search() {
       skip: skip,
       filters: filters,
       // only return answer on first page
-      getAnswer: currentPage === 1 ? true : false 
+      getAnswer: currentPage === 1 ? true : false
     };
 
-    axios.post('/api/search', body)
+    const headers = {
+      "x-functions-key": process.env.REACT_APP_FUNCTION_CODE
+    };
+
+    const url = process.env.REACT_APP_FUNCTION_URL + '/api/search';
+    axios.post(url, body, {headers: headers})
       .then(response => {
         setResults(response.data.results);
         setFacets(response.data.facets);
         setResultCount(response.data.count);
 
         if (currentPage === 1) {
-          setAnswer(response.data.answers[0]);
+          setAnswer(response.data.answers);
         }
         setIsLoading(false);
       })

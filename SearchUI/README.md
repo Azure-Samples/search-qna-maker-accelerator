@@ -1,10 +1,8 @@
 # Azure Cognitive Search UI
 
-This sample is a React template for [Azure Cognitive Search](https://docs.microsoft.com/en-us/azure/search/search-what-is-azure-search). It leverages the [Azure SDK for Javascript/Typescript](https://github.com/Azure/azure-sdk-for-js/tree/master/sdk/search/search-documents/) and [Azure Static Web Apps](https://aka.ms/swadocs) to make it easy to get up and running with a simple web application.
+This sample is a React template for [Azure Cognitive Search](https://docs.microsoft.com/en-us/azure/search/search-what-is-azure-search). It leverages Azure Functions as the backend to communicate with Azure Cognitive Search and QnA Maker.
 
 ![Screenshot of sample web app](./images/web-app.png)
-
-You can easily deploy the sample onto Azure or run it locally by following the steps below.
 
 ## Running the application locally
 
@@ -12,17 +10,17 @@ To run the sample locally, follow the steps below.
 
 ### Prerequisites
 
-- A GitHub account
 - [Node.js and Git](https://nodejs.org/)
-- [Visual Studio Code](https://code.visualstudio.com/?WT.mc_id=shopathome-github-jopapa) installed
-- The [Azure Functions extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions?WT.mc_id=shopathome-github-jopapa) installed
-- The [Azure Functions Core Tools](https://docs.microsoft.com/azure/azure-functions/functions-run-local?WT.mc_id=shopathome-github-jopapa) installed
+- [Visual Studio](https://visualstudio.microsoft.com/) and [Function tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-develop-vs) for Visual Studio
+- [Visual Studio Code](https://code.visualstudio.com/?WT.mc_id=shopathome-github-jopapa)
 
 ### Setup
 
 1. Clone (or Fork and Clone) this repository
 
-1. Rename the `api/local.settings.json.rename` file to `api/local.settings.json`.
+1. Open the Azure Function project `CustomSkillForDataIngestion\CustomSkillForDataIngestion.sln` in Visual Studio
+
+1. Add a `local.settings.json` file to the project
 
 The `local.settings.json` file holds all of the keys that the application needs and should include the following json:
 
@@ -30,30 +28,27 @@ The `local.settings.json` file holds all of the keys that the application needs 
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "",
-    "FUNCTIONS_WORKER_RUNTIME": "node",
-    "SearchApiKey": "",
-    "SearchServiceName": "",
-    "SearchIndexName": "",
-    "SearchFacets": "",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
 
-    "QnAMakerEndpoint": "",
-    "QnAMakerKey": "",
-    "QnAMakerKnowledgeBaseId": "",
-
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName={StorageAcountName};AccountKey={StorageAccountKey};",
     "StorageAccountName": "",
     "StorageAccountKey": "",
-    "StorageContainerName": ""
-  }
+    
+    "SearchServiceApiKey": "",
+    "SearchServiceName": "",
+
+    "QnAMakerEndpoint": "",
+
+  },
+  "Host": {
+    "CORS": "*"
   }
 }
 ```
 
-## Run the app locally
+### Run the Azure functions 
 
-This project can be run anywhere, but VS Code is required for local debugging.
-
-1. Open the application with VS Code.
+1. Run the Azure functon project in visual studio
 
 ### Running the front-end
 
@@ -69,47 +64,4 @@ This project can be run anywhere, but VS Code is required for local debugging.
    npm start
    ```
 
-### Running the API
-
-1. From VS Code, press <kbd>F5</kbd>
-
-## Deploying this sample
-
-### Prerequisites
-
-- A GitHub account
-- An Azure subscription
-
-### Forking the repo
-
-To start off, fork the repo so that you have your own copy.
-
-### Creating the web app
-
-Next, you need to create a Static Web App in the Azure portal. Click the button below to create one:
-
-[![Deploy to Azure button](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/?feature.customportal=false#create/Microsoft.StaticApp)
-
-This will walk you through the process of creating the web app and connecting it to your GitHub repo.
-
-After connecting to the repo, you'll be asked to include some build details. Set the Build Presets to `React` and then specify the following values for the other parameters:
-
-![Azure Static Web Apps Configuration Screenshot](./images/setup.png)
-
-Once you create the static web app, it will automatically deploy the web app to a URL you can find within the portal.
-
-![Azure Static Web Apps Configuration Screenshot](./images/static-web.png)
-
-**Important** - You'll need to make one edit to the default workflow yml file under `.github/workflows` for the application to compile correctly. Add the following `env` parameter under `- name: Build And Deploy` as shown below:
-
-```yml
-- name: Build And Deploy
-  env:
-    REQUIRED_OS_PACKAGES: "libsecret-1-dev"
-```
-
-The last thing you need to do is select configuration and then edit the application settings to add the credentials from `local.settings.json`. It may take a few minutes for this blade to become available in the portal.
-
-![Azure Static Web Apps Configuration Screenshot](./images/config.png)
-
-Additional documentation can be found in the [docs folder](./docs).
+The react project will pull the URL for the Azure functions from the `.env` file. If you'd like to run the front-end locally with the deployed Azure Functions, update the credentials in the `.env` file.

@@ -26,26 +26,32 @@ export default function App() {
   const [knowledgeBaseID, setKnowledgeBaseID] = useState({});
 
   // Fetch authentication API & set user state
-  async function fetchAuth() {
-    const response = await fetch("/.auth/me");
-    if (response) {
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.indexOf("application/json") !== -1) {
-        response.json()
-          .then(response => setUser(response))
-          .catch(error => console.error('Error:', error));
-      }
-    }
-  }
+  // async function fetchAuth() {
+  //   const response = await fetch("/.auth/me");
+  //   if (response) {
+  //     const contentType = response.headers.get("content-type");
+  //     if (contentType && contentType.indexOf("application/json") !== -1) {
+  //       response.json()
+  //         .then(response => setUser(response))
+  //         .catch(error => console.error('Error:', error));
+  //     }
+  //   }
+  // }
 
   // Fetch knowledge base id to construct link in nav bar
   async function fetchKnowledgeBaseID() {
-    const response = await fetch("/api/getKb");
+
+    const headers = {
+      "x-functions-key": process.env.REACT_APP_FUNCTION_CODE
+    };
+    
+    const url = process.env.REACT_APP_FUNCTION_URL + '/api/getKb';
+    const response = await fetch(url, {headers: headers});
     if (response) {
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.indexOf("application/json") !== -1) {
         response.json()
-          .then(response => setKnowledgeBaseID(response.QnAMakerKnowledgeBaseID))
+          .then(response => setKnowledgeBaseID(response.qnAMakerKnowledgeBaseID))
           .catch(error => console.error('Error:', error));
       }
     }
@@ -54,7 +60,7 @@ export default function App() {
   // React Hook: useEffect when component changes
   // Empty array ensure this only runs once on mount
   useEffect(() => {
-    fetchAuth();
+    //fetchAuth();
     fetchKnowledgeBaseID();
   }, []);
 

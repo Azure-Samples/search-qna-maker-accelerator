@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 {
     public static class InitializeAccelerator
@@ -50,9 +51,10 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             {
                 responseMessage = "Failed to initialize accelerator " + e.Message;
             }
-            
+
             return new OkObjectResult(responseMessage);
         }
+
 
         private static async Task CreateContainer(string connectionString, ILogger log)
         {
@@ -63,6 +65,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
                 await blobServiceClient.CreateBlobContainerAsync(Constants.containerName);
                 await blobServiceClient.CreateBlobContainerAsync(Constants.kbContainerName);
+
             }
             catch (Exception e)
             {
@@ -117,9 +120,15 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                     new SearchField("metadata_storage_path", SearchFieldDataType.String) { IsSearchable = true, IsSortable = false, IsFilterable = false, IsFacetable = false },
                     new SearchField("id", SearchFieldDataType.String) { IsKey = true, IsSearchable = true, IsSortable = false, IsFilterable = false, IsFacetable = false },
                     new SearchField("metadata_storage_name", SearchFieldDataType.String) { IsSearchable = true, IsSortable = false, IsFilterable = false, IsFacetable = false },
-                    new SearchField("status", SearchFieldDataType.String) { IsSearchable = false, IsSortable = false, IsFilterable = false, IsFacetable = false }
+                    new SearchField("status", SearchFieldDataType.String) { IsSearchable = false, IsSortable = false, IsFilterable = false, IsFacetable = false },
+                    new SearchField("fileType", SearchFieldDataType.String) { IsSearchable = true, IsSortable = false, IsFilterable = true, IsFacetable = true },
+                    new SearchField("keyPhrases", SearchFieldDataType.Collection(SearchFieldDataType.String)) { IsSearchable = true, IsSortable = false, IsFilterable = true, IsFacetable = true }
                 }
                 };
+
+                var suggester = new SearchSuggester("sg", new[] { "keyPhrases" });
+                index.Suggesters.Add(suggester);
+
 
                 await idxclient.CreateIndexAsync(index);
             }
@@ -195,6 +204,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             }
 
         }
+
 
         private static async Task<HttpResponseMessage> Put(string uri, string body)
         {

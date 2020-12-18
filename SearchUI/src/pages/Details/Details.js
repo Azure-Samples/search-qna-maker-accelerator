@@ -4,9 +4,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Transcript from '../../components/Transcript/Transcript';
 import DocumentViewer from '../../components/DocumentViewer/DocumentViewer';
 import ReactHtmlParser from 'react-html-parser';
-
 import axios from 'axios';
-
 import "./Details.css";
 
 export default function Details() {
@@ -23,7 +21,13 @@ export default function Details() {
   useEffect(() => {
     setIsLoading(true);
 
-    axios.get('/api/lookup?id=' + id)
+    const headers = {
+      "x-functions-key": process.env.REACT_APP_FUNCTION_CODE
+    };
+
+    const url = process.env.REACT_APP_FUNCTION_URL + '/api/lookup?id=' + id;
+    console.log(url);
+    axios.get(url, {headers: headers})
       .then(response => {
         const doc = response.data.document;
         const sas = response.data.sasToken;

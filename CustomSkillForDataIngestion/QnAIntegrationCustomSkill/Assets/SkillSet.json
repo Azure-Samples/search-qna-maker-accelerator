@@ -39,6 +39,23 @@
                     "name": "status"
                 }
             ]
+        },
+        {
+            "@odata.type": "#Microsoft.Skills.Text.KeyPhraseExtractionSkill",
+            "name": "KeyPhraseExtractionSkill",
+            "context": "/document",
+            "inputs": [
+              {
+                "name": "text",
+                "source": "/document/content"
+              }
+            ],
+            "outputs": [
+              {
+                "name": "keyPhrases",
+                "targetName": "keyPhrases"
+              }
+            ]
         }
     ],
     "cognitiveServices": {

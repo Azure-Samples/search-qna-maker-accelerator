@@ -3,6 +3,9 @@
     "targetIndexName": "{{index-name}}",
     "dataSourceName": "{{datasource-name}}",
     "skillsetName": "{{skillset-name}}",
+    "schedule": {
+        "interval": "PT5M"
+    },
     "disabled": false,
     "parameters": {
         "batchSize": 50,
@@ -25,6 +28,10 @@
         {
         	"sourceFieldName": "metadata_storage_name",
         	"targetFieldName": "metadata_storage_name"
+        },
+        {
+        	"sourceFieldName": "metadata_storage_file_extension",
+        	"targetFieldName": "fileType"
         }
    ],
     "outputFieldMappings": [
@@ -35,6 +42,10 @@
         {
             "sourceFieldName": "/document/status",
             "targetFieldName": "status"
+        },
+        {
+            "sourceFieldName": "/document/keyPhrases",
+            "targetFieldName": "keyPhrases"
         }
     ]
 }

@@ -154,6 +154,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             string kbId = string.Empty;
             var path = Path.Join(GetAppSetting("HOME"), Constants.qnamakerFolderPath);
             var filePath = Path.Join(path, Constants.kbIdBlobName + ".txt");
+            
             // Check for kbid in local file system
             if (File.Exists(filePath))
             {
@@ -164,6 +165,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 BlobServiceClient blobServiceClient = new BlobServiceClient(GetAppSetting("AzureWebJobsStorage"));
                 BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(Constants.kbContainerName);
                 BlobClient kbidBlobClient = containerClient.GetBlobClient(Constants.kbIdBlobName);
+                EndpointKeysDTO endpointKey = null;
                 // Check blob for kbid 
                 if (await kbidBlobClient.ExistsAsync())
                 {
@@ -180,7 +182,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 {
                     BlobClient keyBlobClient = containerClient.GetBlobClient(Constants.keyBlobName);
                     kbId = await CreateKB(qnaClient, log);
-                    var endpointKey = await qnaClient.EndpointKeys.GetKeysAsync();
+                    endpointKey = await qnaClient.EndpointKeys.GetKeysAsync();
                     // save kbid and qnamaker runtime key to blob
                     await UploadToBlob(kbidBlobClient, kbId);
                     await UploadToBlob(keyBlobClient, endpointKey.PrimaryEndpointKey);
@@ -188,6 +190,10 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 // save kbid to local file system 
                 Directory.CreateDirectory(path);
                 File.WriteAllText(filePath, kbId);
+
+                // save qna runtime key to local file system 
+                var keyFilePath = Path.Join(path, Constants.keyBlobName + ".txt");
+                File.WriteAllText(keyFilePath, endpointKey.PrimaryEndpointKey);
             }
             return kbId;
         }

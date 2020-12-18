@@ -43,9 +43,8 @@
             }
         },
         "serverFarmsSku": {
-            "defaultValue": "S1",
+            "defaultValue": "S2",
             "allowedValues": [
-                "F1",
                 "D1",
                 "B1",
                 "B2",
@@ -68,6 +67,7 @@
         "repoURL": "https://github.com/jennifermarsman/cognitive-search-qna-solution",
         "repoDirectory": "jennifermarsman/cognitive-search-qna-solution/",
         "branch": "main",
+        "reactProject": "SearchUI",
         "functionProject": "CustomSkillForDataIngestion\\QnAIntegrationCustomSkill\\QnAIntegrationCustomSkill.csproj",
         "qnaServiceName": "[concat(parameters('resourcePrefix'), '-qna-', uniqueString(resourceGroup().id, deployment().name))]",
         "searchServiceName": "[concat(parameters('resourcePrefix'), '-search-service-', uniqueString(resourceGroup().id, deployment().name))]",
@@ -76,7 +76,8 @@
         "storageAccountName": "[concat(parameters('resourcePrefix'), 'storage', uniqueString(resourceGroup().id, deployment().name))]",
         "functionAppName": "[concat(parameters('resourcePrefix'), '-function-app-', uniqueString(resourceGroup().id, deployment().name))]",
         "cognitiveServicesAllInOneName": "[concat(parameters('resourcePrefix'), '-cogsvc-allinone-', uniqueString(resourceGroup().id, deployment().name))]",
-        "appInsightsName": "[concat(parameters('resourcePrefix'), '-insights-', uniqueString(resourceGroup().id, deployment().name))]"
+        "appInsightsName": "[concat(parameters('resourcePrefix'), '-insights-', uniqueString(resourceGroup().id, deployment().name))]",
+        "siteName": "[concat(parameters('resourcePrefix'), '-ui-', uniqueString(resourceGroup().id, deployment().name))]"
     },
     "resources": [
         {
@@ -232,6 +233,11 @@
                 "siteConfig": {
                     "enabled": true,
                     "alwaysOn": true,
+                    "cors": {
+                        "allowedOrigins": [
+                            "*"
+                        ]
+                    },
                     "appSettings": [
                         {
                             "name": "AzureWebJobsStorage",
@@ -280,6 +286,22 @@
                         {
                             "name": "CogServicesKey",
                             "value": "[listkeys(resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAllInOneName')), '2017-04-18').key1]"
+                        },
+                        {
+                            "name": "StorageAccountName",
+                            "value": "[variables('storageAccountName')]"
+                        },
+                        {
+                            "name": "StorageAccountKey",
+                            "value": "[listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value]"
+                        },
+                        {
+                            "name": "QnAMakerEndpoint",
+                            "value": "[concat('https://', variables('qnaAppServiceName'), '.azurewebsites.net')]"
+                        },
+                        {
+                            "name": "SITE_FLAVOR",
+                            "value": "dotnetfunctions"
                         }
                     ]
                 }
@@ -328,6 +350,21 @@
                 "parameters": {
                     "functionAppName": {
                         "value": "[variables('functionAppName')]"
+                    },
+                    "siteName": {
+                        "value": "[variables('siteName')]"
+                    },
+                    "hostingPlanName": {
+                        "value": "[variables('hostingPlanName')]"
+                    },
+                    "reactProject": {
+                        "value": "[variables('reactProject')]"
+                    },
+                    "repoURL": {
+                        "value": "[variables('repoURL')]"
+                    },
+                    "branch": {
+                        "value": "[variables('branch')]"
                     }
                 }
             }

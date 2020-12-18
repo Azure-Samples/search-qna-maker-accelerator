@@ -16,7 +16,7 @@ export default function Suggestions(props) {
     }
 
     let suggestions = props.suggestions.map((s, index) => {
-        return (<div className="suggestion-item" key={index} id={s.text} onMouseDown={suggestionClickHandler}>{s.text}</div>);
+        return (<div className="suggestion-item" key={index} id={s.queryPlusText} onMouseDown={suggestionClickHandler}>{s.queryPlusText}</div>);
       });
 
     return (
