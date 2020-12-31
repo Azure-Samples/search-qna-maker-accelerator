@@ -81,10 +81,10 @@ namespace QnAIntegrationCustomSkill
                     ScoreThreshold = 30
                 };
                 qnaResponse = await runtimeClient.Runtime.GenerateAnswerAsync(kbId, qnaOptions);
-
+        
             }
-
-
+            
+            
             SearchOptions options = new SearchOptions()
             {
                 Size = data.top,
@@ -101,7 +101,7 @@ namespace QnAIntegrationCustomSkill
             options.Select.Add("id");
 
             var response = await searchClient.SearchAsync<SearchDocument>(RemoveStopwords(data.q), options);
-
+           
             Dictionary<string, IList<FacetValue>> facets = new Dictionary<string, IList<FacetValue>>();
 
             foreach (KeyValuePair<string, IList<FacetResult>> facet in response.Value.Facets)
@@ -122,10 +122,13 @@ namespace QnAIntegrationCustomSkill
             output.count = response.Value.TotalCount;
             output.results = response.Value.GetResults().ToList();
             output.facets = facets;
-
+            
             if (qnaResponse != null)
             {
-                output.answers = qnaResponse.Answers.First();
+                output.answers = new QnAResult();
+                output.answers.answer = qnaResponse.Answers.First();
+                log.LogInformation("source: " + output.answers.answer.Source);
+                output.answers.document = await GetDocument(output.answers.answer.Source, output.results);
             }
 
             return new OkObjectResult(output);
@@ -243,6 +246,25 @@ namespace QnAIntegrationCustomSkill
 
             }
             return runtimeKey;
+        }
+
+        private static async Task<SearchResult<SearchDocument>> GetDocument(string source, List<SearchResult<SearchDocument>> searchResult)
+        {
+            // check if source present in search results 
+            foreach (var doc in searchResult)
+            {
+                object name;
+                if (doc.Document.TryGetValue("metadata_storage_name", out name) && name.ToString() == source)
+                {
+                    return doc;
+                }
+            }
+
+            // else query search index
+            SearchOptions options = new SearchOptions();
+            options.SearchFields.Add("metadata_storage_name");
+            var result = await searchClient.SearchAsync<SearchDocument>(source, options);
+            return result.Value.GetResults().ToList().First();
         }
     }
 }

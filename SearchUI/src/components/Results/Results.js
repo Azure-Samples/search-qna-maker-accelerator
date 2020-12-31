@@ -21,9 +21,9 @@ export default function Results(props) {
   let beginDocNumber = Math.min(props.skip + 1, props.count);
   let endDocNumber = Math.min(props.skip + props.top, props.count);
 
-  //console.log(props.documents);
+//console.log(props.documents);
   var answer;
-  if(props.answer.answer && beginDocNumber === 1 && props.answer.answer !== "No good match found in KB.") {
+  if(props.answer.answer.answer && beginDocNumber === 1 && props.answer.answer.answer !== "No good match found in KB.") {
     answer = <Answer data={props.answer}></Answer>;
   } else {
     answer = null;
