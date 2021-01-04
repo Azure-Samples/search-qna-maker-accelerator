@@ -12,7 +12,13 @@ namespace QnAIntegrationCustomSkill
         public long? count { get; set; }
         public List<SearchResult<SearchDocument>> results { get; set; }
         public Dictionary<string, IList<FacetValue>> facets { get; set; }
-        public QnASearchResult answers { get; set; }
+        public QnAResult answers { get; set; }
+    }
+
+    public class QnAResult
+    {
+        public QnASearchResult answer { get; set; }
+        public SearchResult<SearchDocument> document { get; set; }
     }
 
     public class SearchRequest
