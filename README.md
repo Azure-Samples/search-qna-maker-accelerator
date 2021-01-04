@@ -20,7 +20,7 @@ This solution accelerator contains the following artifacts:
 
 You can view a live demo of this repo at the following link:
 
-[https://qna-ui-72xfkwenjkcd2.azurewebsites.net/](https://qna-ui-72xfkwenjkcd2.azurewebsites.net/)
+[https://qna-ui-i3iohrgwgujpo.azurewebsites.net/](https://qna-ui-i3iohrgwgujpo.azurewebsites.net/)
 
 ## Prerequisites
 
