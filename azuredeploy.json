@@ -298,10 +298,6 @@
                         {
                             "name": "QnAMakerEndpoint",
                             "value": "[concat('https://', variables('qnaAppServiceName'), '.azurewebsites.net')]"
-                        },
-                        {
-                            "name": "SITE_FLAVOR",
-                            "value": "dotnetfunctions"
                         }
                     ]
                 }

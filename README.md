@@ -81,7 +81,7 @@ As part of the ARM template, a UI is deployed to `https://{prefix}-ui-{randomStr
 
 At this point, you should consider [adding authentication to the web app in the Azure portal](https://docs.microsoft.com/en-us/azure/app-service/scenario-secure-app-authentication-app-service) to secure your data.
 
-The UI is a React-based Web App available in the `SearchUI` folder. Navigate to [**SearchUI/README.md**](search-ui/README.md) for more details on the web app. 
+The UI is a React-based Web App available in the `SearchUI` folder. Navigate to [**SearchUI/README.md**](SearchUI/README.md) for more details on the web app. 
 
 
 

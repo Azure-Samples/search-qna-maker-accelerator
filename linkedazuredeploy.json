@@ -16,12 +16,14 @@
         },
         "repoURL": {
             "type": "string"
-        }
-        ,"branch": {
+        },
+        "branch": {
             "type": "string"
         }
     },
-    "variables": {},
+    "variables": {
+        "zipUrl": "https://qnastoragei3iohrgwgujpo.blob.core.windows.net/code/web.zip"
+    },
     "resources": [
         {
             "type": "Microsoft.Web/sites",
@@ -45,24 +47,24 @@
                         "PROJECT": "[parameters('reactProject')]",
                         "WEBSITE_NODE_DEFAULT_VERSION": "10.15.3",
                         "REACT_APP_FUNCTION_URL": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net')]",
-                        "REACT_APP_FUNCTION_CODE": "[listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]",
-                        "SITE_FLAVOR": "react"
+                        "REACT_APP_FUNCTION_CODE": "[listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
                     }
                 },
                 {
-                    "type": "sourcecontrols",
-                    "apiVersion": "2020-06-01",
-                    "name": "web",
-                    "location": "[resourceGroup().location]",
+                    "type": "Extensions",
+                    "apiVersion": "2015-02-01",
+                    "name": "MSDeploy",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites', parameters('siteName'))]",
+                        "[concat('Microsoft.Web/Sites/', parameters('siteName'))]",
                         "[resourceId('Microsoft.Web/Sites/config', parameters('siteName'), 'appsettings')]"
                     ],
                     "properties": {
-                        "repoUrl": "[parameters('repoURL')]",
-                        "branch": "[parameters('branch')]",
-                        "isManualIntegration": true
+                        "packageUri": "[variables('zipUrl')]",
+                        "dbType": "None",
+                        "connectionString": ""
                     }
+
+
                 }
             ]
         }
