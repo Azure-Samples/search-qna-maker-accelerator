@@ -1,0 +1,77 @@
+{
+    "routes": [
+      {
+        "route": "/logout",
+        "serve": "/.auth/logout"
+      },
+      {
+        "route": "/login",
+        "serve": "/.auth/login/aad"
+      },
+      {
+        "route": "/.auth/login/github",
+        "statusCode": "404"
+      },
+      {
+        "route": "/.auth/login/google",
+        "statusCode": "404"
+      },
+      {
+        "route": "/.auth/login/facebook",
+        "statusCode": "404"
+      },
+      {
+        "route": "/.auth/login/twitter",
+        "statusCode": "404"
+      },
+      {
+        "route": "/home",
+        "serve": "/",
+        "statusCode": 301
+      },
+      { 
+        "route": "/search"
+      },
+      { 
+        "route": "/upload"
+      },
+      { 
+        "route": "/api/search"
+      },
+      { 
+        "route": "/api/lookup"
+      },
+      { 
+        "route": "/api/suggest"
+      },
+      { 
+        "route": "/api/upload" 
+      },
+      { 
+        "route": "/api/getKb"
+      },
+      { 
+        "route": "/api/answer"
+      },
+      { 
+        "route": "/details/*"
+      },
+      {
+        "route": "/*",
+        "serve": "/",
+        "statusCode": 200
+      }
+    ],
+    "platformErrorOverrides": [
+      {
+        "errorType": "Unauthenticated",
+        "statusCode": 302,
+        "serve": "/login"
+      },
+      {
+        "errorType": "NotFound",
+        "serve": "/index.html",
+        "statusCode": 200
+      }
+    ]
+  }

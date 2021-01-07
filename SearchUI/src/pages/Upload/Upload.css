@@ -1,0 +1,28 @@
+.main--upload {
+    padding:3em;
+    width: fit-content;
+}
+
+.upload-text {
+    font-size: 3em;
+}
+
+input[type="file"] {
+    display: none;
+}
+.custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.file-select {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.file-name {
+    display: inline-block;
+    padding-left: 1em;
+}

@@ -1,0 +1,11 @@
+{
+		"name":"{{datasourcename}}",
+		"description": "QnA docs",
+		"type":"azureblob",
+		"credentials":{
+				"connectionString":"{{connectionString}}"
+		},
+		"container":{
+				"name":"{{containerName}}"
+		}
+}

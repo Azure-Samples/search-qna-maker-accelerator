@@ -1,0 +1,66 @@
+{
+    "name": "{{skillset-name}}",
+    "description": "Skillset",
+    "skills": [
+        {
+            "@odata.type": "#Microsoft.Skills.Custom.WebApiSkill",
+            "name": "UploadToQnA",
+            "description": "Upload the documents to the QnA knowledge base",
+            "uri": "https://{{function-name}}.azurewebsites.net/api/upload-to-qna?code={{function-code}}",
+            "httpMethod": "POST",
+            "context": "/document",
+            "batchSize": 50,
+            "timeout": "PT230S",
+            "degreeOfParallelism": 1,
+            "inputs": [
+                {
+                    "name": "id",
+                    "source": "/document/id"
+                },
+                {
+                    "name": "blobName",
+                    "source": "/document/metadata_storage_name"
+                },
+                {
+                    "name": "blobUrl",
+                    "source": "/document/metadata_storage_path"
+                },
+                {
+                    "name": "sasToken",
+                    "source": "/document/metadata_storage_sas_token"
+                },
+                {
+                  "name": "blobSize",
+                  "source":  "/document/metadata_storage_size"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "status"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#Microsoft.Skills.Text.KeyPhraseExtractionSkill",
+            "name": "KeyPhraseExtractionSkill",
+            "context": "/document",
+            "inputs": [
+              {
+                "name": "text",
+                "source": "/document/content"
+              }
+            ],
+            "outputs": [
+              {
+                "name": "keyPhrases",
+                "targetName": "keyPhrases"
+              }
+            ]
+        }
+    ],
+    "cognitiveServices": {
+        "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
+        "description": "CognitiveServices AllInOne account",
+        "key": "{{cog-svc-allinone-key}}"
+    }
+}
