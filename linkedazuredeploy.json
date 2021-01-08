@@ -13,12 +13,6 @@
         },
         "reactProject": {
             "type": "string"
-        },
-        "repoURL": {
-            "type": "string"
-        },
-        "branch": {
-            "type": "string"
         }
     },
     "variables": {
@@ -73,6 +67,10 @@
         "URL": {
             "type": "string",
             "value": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net/api/init-accelerator?code=',listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]"
+        },
+        "UI": {
+            "type": "string",
+            "value": "[concat('https://',reference(resourceId('Microsoft.Web/sites', parameters('siteName'))).hostNames[0])]"
         }
     }
 }

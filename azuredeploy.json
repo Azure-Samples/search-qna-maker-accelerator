@@ -355,21 +355,19 @@
                     },
                     "reactProject": {
                         "value": "[variables('reactProject')]"
-                    },
-                    "repoURL": {
-                        "value": "[variables('repoURL')]"
-                    },
-                    "branch": {
-                        "value": "[variables('branch')]"
                     }
                 }
             }
         }
     ],
     "outputs": {
-        "HTTP Trigger": {
+        "HTTP trigger to initialize accelerator": {
             "type": "string",
             "value": "[reference('initaccelerator').outputs.URL.value]"
+        },
+        "UI portal link": {
+            "type": "string",
+            "value": "[reference('initaccelerator').outputs.UI.value]"
         }
     }
 }
