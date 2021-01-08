@@ -51,20 +51,21 @@
                     }
                 },
                 {
-                    "type": "Extensions",
-                    "apiVersion": "2015-02-01",
-                    "name": "MSDeploy",
+                    "type": "sourcecontrols",
+                    "apiVersion": "2020-06-01",
+                    "name": "web",
+                    "location": "[resourceGroup().location]",
                     "dependsOn": [
-                        "[concat('Microsoft.Web/Sites/', parameters('siteName'))]",
+                        "[resourceId('Microsoft.Web/sites', parameters('siteName'))]",
                         "[resourceId('Microsoft.Web/Sites/config', parameters('siteName'), 'appsettings')]"
                     ],
                     "properties": {
-                        "packageUri": "[variables('zipUrl')]",
-                        "dbType": "None",
-                        "connectionString": ""
+                        "properties": {
+                            "repoUrl": "[parameters('repoURL')]",
+                            "branch": "[parameters('branch')]",
+                            "isManualIntegration": true
+                        }
                     }
-
-
                 }
             ]
         }
@@ -72,7 +73,11 @@
     "outputs": {
         "URL": {
             "type": "string",
-            "value": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net/api/init-accelerator?code=',listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default)]"
+            "value": "[ concat('https://', parameters('functionAppName'), '.azurewebsites.net/api/init-accelerator?code=', listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'), '2019-08-01').functionKeys.default) ]"
+        },
+        "UI": {
+            "type": "string",
+            "value": "[concat('https://',reference(resourceId('Microsoft.Web/sites', parameters('siteName'))).hostNames[0])]"
         }
     }
-}
+} 
