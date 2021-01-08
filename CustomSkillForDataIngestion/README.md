@@ -6,7 +6,7 @@ A single endpoint can be created to call both Azure Cognitive Search and QnA Mak
 
 ```json
 {
-    "q": "what are covid symptoms?",
+    "q": "how do mrna vaccines work?",
     "top": 10,
     "skip": 0,
     "filters": [],
@@ -22,69 +22,83 @@ Below is a sample output from the call above. The output has been abbreviated fo
 
 ```json
 {
-  "count": 54,
-  "results": [
-    {
-      "score": 4.895756,
-      "highlights": {
-        "content": [
-          "What are the <em>symptoms</em> of <em>COVID</em>-19?",
-          "Are the <em>symptoms</em> of <em>COVID</em>-19 different in children than in adults?",
-          "Until when should I wear a mask after recovering from an illness with respiratory\n<em>symptoms</em>?",
-          "Can I catch the virus from being in an enclosed space (i.e. bus, subway) in close proximity\nto someone who doesn’t have respiratory <em>symptoms</em>?",
-          "I\nam well and have no <em>symptoms</em>."
-        ]
-      },
-      "document": {
-        "content": "\nCOVID-19 Response\n\nHome Secretary-General Stories UN News For UN Personnel....",
-        "metadata_storage_path": "https://dqnastoragen74w2pwcgwlii.blob.core.windows.net/covid-docs/UN%20Dataset.pdf",
-        "id": "aHR0cHM6Ly9kcW5hc3RvcmFnZW43NHcycHdjZ3dsaWkuYmxvYi5jb3JlLndpbmRvd3MubmV0L2NvdmlkLWRvY3MvVU4lMjBEYXRhc2V0LnBkZg2",
-        "metadata_storage_name": "UN Dataset.pdf",
-        "status": "InQueue",
-        "keyPhrases": [
-          "symptoms of COVID",
-          "cure COVID",
-          "local transmission of COVID",
-          "virus",
-          "respiratory symptoms"
-        ],
-        "fileType": ".pdf"
+  "count":11,
+   "results":[
+      {
+         "score":7.169414,
+         "highlights":{
+            "content":[
+               "For more information: www.cdc.gov/COVID19\n\nWhat Clinicians Need to Know About the \n\nPfizer-BioNTech COVID-19 Vaccine\n\nAmanda Cohn, MD\n\nSarah Mbaeyi, MD, MPH\n\nDecember 13, 2020\n\n\n\n2\n\nPfizer-BioNTech COVID-19 Vaccine\n\n\n\n Lipid nanoparticle-formulated <em>mRNA</em> vaccine \n\nencoding the spike protein\n\n– Spike protein: facilitates entry of virus into cells\n\n Vaccination induces antibodies that can block entry \n\nof SARS-CoV-2 into cells, thereby preventing \n\ninfection\n\n FDA issued an Emergency Use Authorization on \n\nDecember 13, 2020 for use in persons aged ≥16 \n\nyears\n\nPfizer-BioNTech COVID-19 vaccine\n\nSpike protein\n\n3\n\n\n\n <em>mRNA</em> <em>vaccines</em> take advantage of the process that cells use to make proteins in \n\norder to trigger an immune response \n\n– Like all <em>vaccines</em>, COVID-19 <em>mRNA</em> <em>vaccines</em> have been rigorously tested for \n\nsafety before being authorized for use in the United States\n\n– <em>mRNA</em> technology is new, but not unknown."
+            ]
+         },
+         "document":{
+            "metadata_storage_path":"https://q2storage7nzzkuzdcevvy.blob.core.windows.net/qna-container/pfizer-biontech-vaccine-what-Clinicians-need-to-know.pdf",
+            "id":"aHR0cHM6Ly9xMnN0b3JhZ2U3bnp6a3V6ZGNldnZ5LmJsb2IuY29yZS53aW5kb3dzLm5ldC9xbmEtY29udGFpbmVyL3BmaXplci1iaW9udGVjaC12YWNjaW5lLXdoYXQtQ2xpbmljaWFucy1uZWVkLXRvLWtub3cucGRm0",
+            "metadata_storage_name":"pfizer-biontech-vaccine-what-Clinicians-need-to-know.pdf"
+         }
       }
       ...
       ...
-    }
   ],
-  "facets": {
-    "fileType": [
-      {
-        "count": 26,
-        "value": ".html"
-      },
-      {
-        "count": 26,
-        "value": ".pdf"
-      },
-      {
-        "count": 2,
-        "value": ".txt"
-      }
-    ]
-  },
-  "answers": [
-    {
-      "questions": [
-        "What are the symptoms?"
+ "facets":{
+      "keyPhrases":[
+         {
+            "value":"COVID",
+            "count":8
+         },
+         {
+            "value":"Asked Questions",
+            "count":5
+         },
+         {
+            "value":"CDC",
+            "count":5
+         }
       ],
-      "answer": "People with COVID-19 have had a wide range of symptoms reported – ranging from mild symptoms to severe illness. Symptoms may appear 2-14 days after exposure to the virus.\n\nOther symptoms:\n\nFever Cough Difficulty breathing\n\n• Chills\n\n• Muscle Pain\n\n• Sore throat\n\n• New loss of taste or smell",
-      "score": 80.5,
-      "id": 1442,
-      "source": "novel-coronavirus-factsheet.pdf",
-      "metadata": [],
-      "context": {
-        "isContextOnly": false,
-        "prompts": []
+      "fileType":[
+         {
+            "value":".pdf",
+            "count":8
+         },
+         {
+            "value":".docx",
+            "count":3
+         }
+      ]
+   },
+  "answers":{
+      "answer":{
+         "questions":[
+            "How do the Pfizer and Moderna mRNA vaccines work?"
+         ],
+         "answer":"The vaccines contain synthetic mRNA, which is genetic information used to make the SARS-CoV-2 spike protein. The spike protein is the part of the virus that attaches to human cells. The spike protein alone cannot cause COVID-19. Once the spike protein is created it causes the immune system to make antibodies against the virus. These antibodies can the provide protection if a person comes into contact with the virus.",
+         "score":95.0,
+         "id":19,
+         "source":"COVID-19 Vaccine FAQ.pdf",
+         "metadata":[
+            
+         ],
+         "context":{
+            "isContextOnly":false,
+            "prompts":[
+               
+            ]
+         }
+      },
+      "document":{
+         "score":4.249519,
+         "highlights":{
+            "content":[
+               "How do the Pfizer and Moderna <em>mRNA</em> <em>vaccines</em> <em>work</em>?",
+               "The <em>vaccines</em> contain synthetic <em>mRNA</em>, which is genetic information used to make the SARS-CoV-2 spike protein.",
+            ]
+         },
+         "document":{
+            "metadata_storage_path":"https://q2storage7nzzkuzdcevvy.blob.core.windows.net/qna-container/COVID-19%20Vaccine%20FAQ.pdf",
+            "id":"aHR0cHM6Ly9xMnN0b3JhZ2U3bnp6a3V6ZGNldnZ5LmJsb2IuY29yZS53aW5kb3dzLm5ldC9xbmEtY29udGFpbmVyL0NPVklELTE5JTIwVmFjY2luZSUyMEZBUS5wZGY1",
+            "metadata_storage_name":"COVID-19 Vaccine FAQ.pdf"
+         }
       }
-    }
-  ]
+  }
 }
 ```

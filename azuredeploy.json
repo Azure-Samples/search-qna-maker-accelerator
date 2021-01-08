@@ -360,8 +360,8 @@
                     "reactProject": {
                         "value": "[variables('reactProject')]"
                     },
-                    "repoURL": {
-                        "value": "[variables('repoURL')]"
+                    "repoUrl": {
+                        "value": "[variables('repoUrl')]"
                     },
                     "branch": {
                         "value": "[variables('branch')]"
