@@ -14,7 +14,7 @@
         "reactProject": {
             "type": "string"
         },
-        "repoURL": {
+        "repoUrl": {
             "type": "string"
         },
         "branch": {
@@ -58,7 +58,7 @@
                     ],
                     "properties": {
                         "properties": {
-                            "repoUrl": "[parameters('repoURL')]",
+                            "repoUrl": "[parameters('repoUrl')]",
                             "branch": "[parameters('branch')]",
                             "isManualIntegration": true
                         }
