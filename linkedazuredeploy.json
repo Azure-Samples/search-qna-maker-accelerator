@@ -14,7 +14,7 @@
         "reactProject": {
             "type": "string"
         },
-        "repoUrl": {
+        "repoURL": {
             "type": "string"
         },
         "branch": {
