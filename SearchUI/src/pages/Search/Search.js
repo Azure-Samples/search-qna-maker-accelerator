@@ -10,7 +10,7 @@ import SearchBar from '../../components/SearchBar/SearchBar';
 
 import "./Search.css";
 
-export default function Search() {
+export default function Search(props) {
 
   let location = useLocation();
   let history = useHistory();
@@ -41,10 +41,10 @@ export default function Search() {
     };
 
     const headers = {
-      "x-functions-key": process.env.REACT_APP_FUNCTION_CODE
+      "x-functions-key": props.code
     };
 
-    const url = process.env.REACT_APP_FUNCTION_URL + '/api/search';
+    const url = props.url + '/api/search';
     axios.post(url, body, {headers: headers})
       .then(response => {
         setResults(response.data.results);
@@ -103,7 +103,7 @@ export default function Search() {
       <div className="row">
         <div className="col-md-3">
           <div className="search-bar">
-            <SearchBar postSearchHandler={postSearchHandler} q={q}></SearchBar>
+            <SearchBar postSearchHandler={postSearchHandler} q={q} code={props.code} url={props.url}></SearchBar>
           </div>
           <Facets facets={facets} filters={filters} setFilters={setFilters}></Facets>
         </div>

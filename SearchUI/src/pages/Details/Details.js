@@ -7,7 +7,7 @@ import ReactHtmlParser from 'react-html-parser';
 import axios from 'axios';
 import "./Details.css";
 
-export default function Details() {
+export default function Details(props) {
 
   let { id } = useParams();
   const [document, setDocument] = useState({});
@@ -22,10 +22,10 @@ export default function Details() {
     setIsLoading(true);
 
     const headers = {
-      "x-functions-key": process.env.REACT_APP_FUNCTION_CODE
+      "x-functions-key": props.code
     };
 
-    const url = process.env.REACT_APP_FUNCTION_URL + '/api/lookup?id=' + id;
+    const url = props.url + '/api/lookup?id=' + id;
     console.log(url);
     axios.get(url, {headers: headers})
       .then(response => {

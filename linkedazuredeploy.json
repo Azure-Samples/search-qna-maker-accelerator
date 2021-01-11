@@ -13,13 +13,10 @@
         },
         "reactProject": {
             "type": "string"
-        },
-        "repoUrl": {
-            "type": "string"
-        },
-        "branch": {
-            "type": "string"
         }
+    },
+    "variables": {
+        "zipUrl": "https://qnastoragei3iohrgwgujpo.blob.core.windows.net/code/web.zip"
     },
     "resources": [
         {
@@ -48,20 +45,17 @@
                     }
                 },
                 {
-                    "type": "sourcecontrols",
-                    "apiVersion": "2020-06-01",
-                    "name": "web",
-                    "location": "[resourceGroup().location]",
+                    "type": "Extensions",
+                    "apiVersion": "2015-02-01",
+                    "name": "MSDeploy",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites', parameters('siteName'))]",
+                        "[concat('Microsoft.Web/Sites/', parameters('siteName'))]",
                         "[resourceId('Microsoft.Web/Sites/config', parameters('siteName'), 'appsettings')]"
                     ],
                     "properties": {
-                        "properties": {
-                            "repoUrl": "[parameters('repoURL')]",
-                            "branch": "[parameters('branch')]",
-                            "isManualIntegration": true
-                        }
+                        "packageUri": "[variables('zipUrl')]",
+                        "dbType": "None",
+                        "connectionString": ""
                     }
                 }
             ]
