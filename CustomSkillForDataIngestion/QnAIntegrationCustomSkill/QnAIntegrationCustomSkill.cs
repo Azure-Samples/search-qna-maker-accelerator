@@ -55,7 +55,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             {
                 return new BadRequestObjectResult($"{skillName} - Invalid request record array.");
             }
-            var msgBatch = new QnAQueueMessageBatch();        
+            var msgBatch = new QnAQueueMessageBatch();
             WebApiSkillResponse response = WebApiSkillHelpers.ProcessRequestRecords(skillName, requestRecords,
                 (inRecord, outRecord) =>
                 {
@@ -131,9 +131,15 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
             foreach (var msg in qnaQueueMessage.Values)
             {
+                if (msg.FileName == msg.BlobPath)
+                {
+                    continue;
+                }
+
+                // override source of file in qna maker to blob path.
                 var index = update.IndexOf(msg.FileUri) + msg.FileUri.Length + 1;
-                string append = $",\"source\":\"{msg.BlobPath}\"";
-                update = update.Insert(index, append);
+                string sourceOverride = $",\"source\":\"{msg.BlobPath}\"";
+                update = update.Insert(index, sourceOverride);
             }
 
             var stopwatch = new Stopwatch();
@@ -235,17 +241,13 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
         {
             var service = "/qnamaker/v4.0";
             string uri = qnaClient.Endpoint + service + "/knowledgebases/" + kbId;
-            var dummyOperation = new Operation(operationState: OperationStateType.Failed);
-
-            // To speed up extraction within one batch request and to skip sources that have extraction failure
-            string append = ",\"maxDegreeOfParallelism\":4, \"skipSourcesWithExtractionFailure\":true";
-            updateKB = updateKB.Insert(updateKB.Length - 1, append);
-
+            updateKB = UpdateKBParams(updateKB);
             // Starts the QnA Maker operation to update the knowledge base
             var response = await Patch(uri, GetAppSetting("QnAAuthoringKey"), updateKB);
 
             if (response.statusCode != HttpStatusCode.Accepted.ToString())
             {
+                var dummyOperation = new Operation(operationState: OperationStateType.Failed);
                 log.LogError("Error while sending update KB request: " + response.response + ", status code: " + response.statusCode);
                 return dummyOperation;
             }
@@ -344,6 +346,14 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             updateKB.Add.Files = new List<FileDTO>();
             return updateKB;
 
+        }
+
+        private static string UpdateKBParams(string updateKB)
+        {
+            // To speed up extraction within one batch request and to skip sources that have extraction failure
+            string append = ",\"maxDegreeOfParallelism\":4, \"skipSourcesWithExtractionFailure\":true";
+            updateKB = updateKB.Insert(updateKB.Length - 1, append);
+            return updateKB;
         }
 
         private static string GetAppSetting(string key)
