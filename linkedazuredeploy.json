@@ -27,16 +27,19 @@
             "dependsOn": [],
             "properties": {
                 "serverFarmId": "[parameters('hostingPlanName')]",
-                "appSettings": [
-                    {
-                        "name": "REACT_APP_FUNCTION_URL",
-                        "value": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net')]"
-                    },
-                    {
-                        "name": "REACT_APP_FUNCTION_CODE",
-                        "value": "[listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
-                    }
-                ]
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "REACT_APP_FUNCTION_URL",
+                            "value": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net')]"
+                        },
+                        {
+                            "name": "REACT_APP_FUNCTION_CODE",
+                            "value": "[listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
+                        }
+                    ]
+                }
+
             },
             "resources": [
                 {
@@ -65,4 +68,4 @@
             "value": "[concat('https://',reference(resourceId('Microsoft.Web/sites', parameters('siteName'))).hostNames[0])]"
         }
     }
-} 
+}
