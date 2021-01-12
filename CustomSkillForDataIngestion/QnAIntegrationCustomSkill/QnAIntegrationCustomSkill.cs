@@ -30,6 +30,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
     public static class UploadToQnAMaker
     {
         private static HttpClient httpClient = new HttpClient();
+        private static string blobBaseURL = $"https://{GetAppSetting("StorageAccountName")}.blob.core.windows.net/{Constants.containerName}/";
         private static Dictionary<string, int> FileTypeToSizeLimitInQnAMaker = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
                                                                             {
                                                                                 { "txt", Constants.MaxTextFileSizeInMb * 1024 },
@@ -54,7 +55,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             {
                 return new BadRequestObjectResult($"{skillName} - Invalid request record array.");
             }
-            var msgBatch = new QnAQueueMessageBatch(); 
+            var msgBatch = new QnAQueueMessageBatch();        
             WebApiSkillResponse response = WebApiSkillHelpers.ProcessRequestRecords(skillName, requestRecords,
                 (inRecord, outRecord) =>
                 {
@@ -83,7 +84,8 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                         {
                             Id = id,
                             FileName = blobName,
-                            FileUri = fileUri
+                            FileUri = fileUri,
+                            BlobPath = blobUrl.Remove(0, blobBaseURL.Length)
                         };
                         msgBatch.Values.Add(queueMessage);
                         if (msgBatch.Values.Count >= 10)
@@ -120,15 +122,24 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             var indexDocuments = new List<IndexDocument>();
             foreach (var msg in qnaQueueMessage.Values)
             {
-                updateKB.Delete.Sources.Add(msg.FileName);
+                updateKB.Delete.Sources.Add(msg.BlobPath);
                 updateKB.Add.Files.Add(new FileDTO { FileName = msg.FileName, FileUri = msg.FileUri });
                 indexDocuments.Add(new IndexDocument { id = msg.Id });
+            }
+
+            string update = JsonConvert.SerializeObject(updateKB);
+
+            foreach (var msg in qnaQueueMessage.Values)
+            {
+                var index = update.IndexOf(msg.FileUri) + msg.FileUri.Length + 1;
+                string append = $",\"source\":\"{msg.BlobPath}\"";
+                update = update.Insert(index, append);
             }
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             // call update KB using REST API
-            var updateOp = await UpdateKB(qnaClient, updateKB, kbId, log);
+            var updateOp = await UpdateKB(qnaClient, update, kbId, log);
             updateOp = await MonitorOperation(qnaClient, updateOp, log);
             stopwatch.Stop();
             log.LogInformation("upload-to-qna-queue-trigger: update operation time = " + stopwatch.Elapsed.TotalSeconds + " seconds. Number of files processed = " + updateKB.Add.Files.Count);
@@ -220,19 +231,18 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             return kbId;
         }
 
-        private static async Task<Operation> UpdateKB(QnAMakerClient qnaClient, UpdateKbOperationDTO updateKB, string kbId, ILogger log)
+        private static async Task<Operation> UpdateKB(QnAMakerClient qnaClient, string updateKB, string kbId, ILogger log)
         {
             var service = "/qnamaker/v4.0";
             string uri = qnaClient.Endpoint + service + "/knowledgebases/" + kbId;
             var dummyOperation = new Operation(operationState: OperationStateType.Failed);
 
-            string content = JsonConvert.SerializeObject(updateKB);
             // To speed up extraction within one batch request and to skip sources that have extraction failure
             string append = ",\"maxDegreeOfParallelism\":4, \"skipSourcesWithExtractionFailure\":true";
-            content = content.Insert(content.Length - 1, append);
+            updateKB = updateKB.Insert(updateKB.Length - 1, append);
 
             // Starts the QnA Maker operation to update the knowledge base
-            var response = await Patch(uri, GetAppSetting("QnAAuthoringKey"), content);
+            var response = await Patch(uri, GetAppSetting("QnAAuthoringKey"), updateKB);
 
             if (response.statusCode != HttpStatusCode.Accepted.ToString())
             {
@@ -353,6 +363,8 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             public string FileName { get; set; }
 
             public string FileUri { get; set; }
+
+            public string BlobPath { get; set; }
         }
 
         public class IndexDocument

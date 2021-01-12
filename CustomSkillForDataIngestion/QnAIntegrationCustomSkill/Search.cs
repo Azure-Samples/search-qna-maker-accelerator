@@ -13,12 +13,10 @@ using Azure.Search.Documents;
 using System.Collections.Generic;
 using Azure.Search.Documents.Models;
 using System.Linq;
-using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Azure.CognitiveServices.Knowledge.QnAMaker;
 using Microsoft.Azure.CognitiveServices.Knowledge.QnAMaker.Models;
-using Microsoft.Azure.Documents.SystemFunctions;
 
 namespace QnAIntegrationCustomSkill
 {
@@ -42,6 +40,7 @@ namespace QnAIntegrationCustomSkill
 
         private static QnAMakerRuntimeClient runtimeClient;
         private static string qnaMakerEndpoint = Environment.GetEnvironmentVariable("QnAMakerEndpoint", EnvironmentVariableTarget.Process);
+        private static string blobBaseURL = $"https://{storageAccountName}.blob.core.windows.net/{Constants.containerName}/";
 
         [FunctionName("Search")]
         public static async Task<IActionResult> Run(
@@ -127,8 +126,8 @@ namespace QnAIntegrationCustomSkill
             {
                 output.answers = new QnAResult();
                 output.answers.answer = qnaResponse.Answers.First();
-                log.LogInformation("source: " + output.answers.answer.Source);
-                output.answers.document = await GetDocument(output.answers.answer.Source, output.results);
+                var source = output.answers.answer.Source;
+                output.answers.document = await GetDocument(source, output.results);
             }
 
             return new OkObjectResult(output);
@@ -250,11 +249,17 @@ namespace QnAIntegrationCustomSkill
 
         private static async Task<SearchResult<SearchDocument>> GetDocument(string source, List<SearchResult<SearchDocument>> searchResult)
         {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var blobURL = string.Concat(blobBaseURL, source);
             // check if source present in search results 
             foreach (var doc in searchResult)
             {
                 object name;
-                if (doc.Document.TryGetValue("metadata_storage_name", out name) && name.ToString() == source)
+                if (doc.Document.TryGetValue("metadata_storage_path", out name) && name.ToString() == blobURL)
                 {
                     return doc;
                 }
@@ -262,8 +267,8 @@ namespace QnAIntegrationCustomSkill
 
             // else query search index
             SearchOptions options = new SearchOptions();
-            options.SearchFields.Add("metadata_storage_name");
-            var result = await searchClient.SearchAsync<SearchDocument>(source, options);
+            options.SearchFields.Add("metadata_storage_path");
+            var result = await searchClient.SearchAsync<SearchDocument>(blobURL, options);
             return result.Value.GetResults().ToList().First();
         }
     }
