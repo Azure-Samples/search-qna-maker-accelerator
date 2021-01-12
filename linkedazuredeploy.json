@@ -26,25 +26,19 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [],
             "properties": {
-                "serverFarmId": "[parameters('hostingPlanName')]"
-
+                "serverFarmId": "[parameters('hostingPlanName')]",
+                "appSettings": [
+                    {
+                        "name": "REACT_APP_FUNCTION_URL",
+                        "value": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net')]"
+                    },
+                    {
+                        "name": "REACT_APP_FUNCTION_CODE",
+                        "value": "[listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
+                    }
+                ]
             },
             "resources": [
-                {
-                    "apiVersion": "2018-11-01",
-                    "name": "appsettings",
-                    "type": "config",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
-                    ],
-                    "properties": {
-                        "PROJECT": "[parameters('reactProject')]",
-                        "WEBSITE_NODE_DEFAULT_VERSION": "10.15.3",
-                        "REACT_APP_FUNCTION_URL": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net')]",
-                        "REACT_APP_FUNCTION_CODE": "[listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]",
-                        "SITE_FLAVOR": "react"
-                    }
-                },
                 {
                     "type": "Extensions",
                     "apiVersion": "2015-02-01",
