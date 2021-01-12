@@ -41,7 +41,8 @@
                         "PROJECT": "[parameters('reactProject')]",
                         "WEBSITE_NODE_DEFAULT_VERSION": "10.15.3",
                         "REACT_APP_FUNCTION_URL": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net')]",
-                        "REACT_APP_FUNCTION_CODE": "[listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
+                        "REACT_APP_FUNCTION_CODE": "[listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]",
+                        "SITE_FLAVOR": "react"
                     }
                 },
                 {
