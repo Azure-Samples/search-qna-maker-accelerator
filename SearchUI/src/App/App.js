@@ -1,5 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import axios from 'axios';
 
 // Context for user authentication
 import { AuthContext } from '../contexts/AuthContext';
@@ -21,9 +23,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 export default function App() {
+
   // React Hook: useState with a var name, set function, & default value
+  const [functionCode, setFunctionCode] = useState("");
+  const [functionUrl, setFunctionUrl] = useState("");
   const [user, setUser] = useState({});
-  const [knowledgeBaseID, setKnowledgeBaseID] = useState({});
+  const [knowledgeBaseID, setKnowledgeBaseID] = useState("");
 
   // Fetch authentication API & set user state
   // async function fetchAuth() {
@@ -38,46 +43,63 @@ export default function App() {
   //   }
   // }
 
-  // Fetch knowledge base id to construct link in nav bar
-  async function fetchKnowledgeBaseID() {
+  async function fetchCredentials() {
+    const config_url = "/config";
+    axios.get(config_url)
+      .then(response => {
+        console.log(response);
+        setFunctionCode(response.data.code);
+        setFunctionUrl(response.data.url);
 
-    const headers = {
-      "x-functions-key": process.env.REACT_APP_FUNCTION_CODE
-    };
-    
-    const url = process.env.REACT_APP_FUNCTION_URL + '/api/getKb';
-    const response = await fetch(url, {headers: headers});
-    if (response) {
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.indexOf("application/json") !== -1) {
-        response.json()
-          .then(response => setKnowledgeBaseID(response.qnAMakerKnowledgeBaseID))
-          .catch(error => console.error('Error:', error));
-      }
-    }
+        const headers = {
+          "x-functions-key": response.data.code
+        };
+        
+        const url = response.data.url + '/api/getKb';
+        axios.get(url, {headers: headers})
+          .then(kbResponse => {
+            setKnowledgeBaseID(kbResponse.data.qnAMakerKnowledgeBaseID)
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
+
 
   // React Hook: useEffect when component changes
   // Empty array ensure this only runs once on mount
   useEffect(() => {
     //fetchAuth();
-    fetchKnowledgeBaseID();
+      fetchCredentials();
   }, []);
 
-  return (
-    <AuthContext.Provider value={user}>
-      <div className="container-fluid app">
-        <AppHeader kbId={knowledgeBaseID} />
-        <Router>
-          <Switch>
-            <Route path="/" exact component={Home} />
-            <Route path="/search" component={Search} />
-            <Route path="/upload" component={Upload} />
-            <Route path="/details/:id" component={Details} />
-          </Switch>
-        </Router>
-        {/* <AppFooter /> */}
-      </div>
-    </AuthContext.Provider>
-  );
+  if (functionUrl !== "") {
+    return (
+      <AuthContext.Provider value={user}>
+        <div className="container-fluid app">
+          <AppHeader kbId={knowledgeBaseID} />
+          <Router>
+            <Switch>
+              <Route path="/" exact render={() => <Home code={functionCode} url={functionUrl} />} />
+              <Route path="/search" render={() => <Search code={functionCode} url={functionUrl} />} />
+              <Route path="/upload" render={() => <Upload code={functionCode} url={functionUrl} />} />
+              <Route path="/details/:id" render={() => <Details code={functionCode} url={functionUrl} />} />
+            </Switch>
+          </Router>
+          {/* <AppFooter /> */}
+        </div>
+      </AuthContext.Provider>
+    );
+  } else {
+    return (
+      <CircularProgress />
+    );
+  }
+
+  
 }

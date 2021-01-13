@@ -48,13 +48,13 @@ export default function SearchBar(props) {
             };
 
             const headers = {
-                "x-functions-key": process.env.REACT_APP_FUNCTION_CODE
+                "x-functions-key": props.code
               };
 
             if (q === '') {
                 setSuggestions([]);
             } else {
-                const url = process.env.REACT_APP_FUNCTION_URL + '/api/suggest';
+                const url = props.url + '/api/suggest';
                 axios.post( url, body, {headers: headers})
                 .then( response => {
                     setSuggestions(response.data.suggestions);
@@ -84,7 +84,7 @@ export default function SearchBar(props) {
                         type="text" 
                         id="search-box" 
                         className="form-control rounded-0" 
-                        placeholder="What are you looking for?" 
+                        placeholder="What do you want to know?" 
                         onChange={onChangeHandler} 
                         defaultValue={props.q}
                         onBlur={() => setShowSuggestions(false)}

@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "functionAppName": {
@@ -13,15 +13,11 @@
         },
         "reactProject": {
             "type": "string"
-        },
-        "repoUrl": {
-            "type": "string"
-        },
-        "branch": {
-            "type": "string"
         }
     },
-    "variables": {},
+    "variables": {
+        "zipUrl": "https://qnastoragei3iohrgwgujpo.blob.core.windows.net/code/web.zip"
+    },
     "resources": [
         {
             "type": "Microsoft.Web/sites",
@@ -30,38 +26,33 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [],
             "properties": {
-                "serverFarmId": "[parameters('hostingPlanName')]"
+                "serverFarmId": "[parameters('hostingPlanName')]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "REACT_APP_FUNCTION_URL",
+                            "value": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net')]"
+                        },
+                        {
+                            "name": "REACT_APP_FUNCTION_CODE",
+                            "value": "[listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]"
+                        }
+                    ]
+                }
 
             },
             "resources": [
                 {
-                    "apiVersion": "2018-11-01",
-                    "name": "appsettings",
-                    "type": "config",
+                    "type": "Extensions",
+                    "apiVersion": "2015-02-01",
+                    "name": "MSDeploy",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+                        "[concat('Microsoft.Web/Sites/', parameters('siteName'))]"
                     ],
                     "properties": {
-                        "PROJECT": "[parameters('reactProject')]",
-                        "WEBSITE_NODE_DEFAULT_VERSION": "10.15.3",
-                        "REACT_APP_FUNCTION_URL": "[concat('https://',parameters('functionAppName'),'.azurewebsites.net')]",
-                        "REACT_APP_FUNCTION_CODE": "[listkeys(concat(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '/host/default/'),'2019-08-01').functionKeys.default]",
-                        "SITE_FLAVOR": "react"
-                    }
-                },
-                {
-                    "type": "sourcecontrols",
-                    "apiVersion": "2020-06-01",
-                    "name": "web",
-                    "location": "[resourceGroup().location]",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites', parameters('siteName'))]",
-                        "[resourceId('Microsoft.Web/Sites/config', parameters('siteName'), 'appsettings')]"
-                    ],
-                    "properties": {
-                        "repoUrl": "[parameters('repoUrl')]",
-                        "branch": "[parameters('branch')]",
-                        "isManualIntegration": true
+                        "packageUri": "[variables('zipUrl')]",
+                        "dbType": "None",
+                        "connectionString": ""
                     }
                 }
             ]
@@ -77,4 +68,4 @@
             "value": "[concat('https://',reference(resourceId('Microsoft.Web/sites', parameters('siteName'))).hostNames[0])]"
         }
     }
-} 
+}

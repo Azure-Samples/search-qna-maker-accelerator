@@ -4,7 +4,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import "./Upload.css";
 
-export default function Upload() {
+export default function Upload(props) {
 
   const [file, setFile] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -38,10 +38,10 @@ export default function Upload() {
       }
 
       const headers = {
-        "x-functions-key": process.env.REACT_APP_FUNCTION_CODE
+        "x-functions-key": props.code
       };
 
-      const url = process.env.REACT_APP_FUNCTION_URL + '/api/upload';
+      const url = props.url + '/api/upload';
       axios.post(url, body, {headers: headers})
         .then(response => {
           setIsLoading(false);
