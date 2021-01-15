@@ -45,7 +45,28 @@ export default function App() {
 
   async function fetchCredentials() {
     const config_url = "/config";
-    axios.get(config_url)
+
+    // if NODE_ENV is development, pull variables from local .env file
+    // otherwise, pull variables from config endpoint
+    if (process.env.NODE_ENV === 'development') {
+        setFunctionCode(process.env.REACT_APP_FUNCTION_CODE);
+        setFunctionUrl(process.env.REACT_APP_FUNCTION_URL);
+
+        const headers = {
+          "x-functions-key": process.env.REACT_APP_FUNCTION_CODE
+        };
+        
+        const url = process.env.REACT_APP_FUNCTION_URL + '/api/getKb';
+        axios.get(url, {headers: headers})
+          .then(kbResponse => {
+            setKnowledgeBaseID(kbResponse.data.qnAMakerKnowledgeBaseID)
+          })
+          .catch(error => {
+            console.log(error);
+          });
+
+    } else {
+      axios.get(config_url)
       .then(response => {
         console.log(response);
         setFunctionCode(response.data.code);
@@ -68,6 +89,7 @@ export default function App() {
       .catch(error => {
         console.log(error);
       });
+    }
   }
 
 
