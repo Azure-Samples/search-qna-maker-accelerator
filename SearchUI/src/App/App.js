@@ -68,7 +68,6 @@ export default function App() {
     } else {
       axios.get(config_url)
       .then(response => {
-        console.log(response);
         setFunctionCode(response.data.code);
         setFunctionUrl(response.data.url);
 
