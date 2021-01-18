@@ -120,13 +120,13 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             var indexDocuments = new List<IndexDocument>();
             foreach (var msg in qnaQueueMessage.Values)
             {
-                var blobPath = GetBlobPath(msg.FileUri, msg.FileName);
-                updateKB.Delete.Sources.Add(blobPath);
+                var blobPath = GetBlobPath(msg.FileUri, log);
+                updateKB.Delete.Sources.Add(string.IsNullOrEmpty(blobPath) ? msg.FileName : blobPath);
                 updateKB.Add.Files.Add(new FileDTO { FileName = msg.FileName, FileUri = msg.FileUri });
                 indexDocuments.Add(new IndexDocument { id = msg.Id });
             }
 
-            string updateKBSerialized = AddUpdateKBParams(updateKB, qnaQueueMessage);
+            string updateKBSerialized = AddUpdateKBParams(updateKB, qnaQueueMessage, log);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -334,13 +334,13 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
         }
 
-        private static string AddUpdateKBParams(UpdateKbOperationDTO updateKBDTO, QnAQueueMessageBatch qnaQueueMessage)
+        private static string AddUpdateKBParams(UpdateKbOperationDTO updateKBDTO, QnAQueueMessageBatch qnaQueueMessage, ILogger log)
         {
             var updateKB = JsonConvert.SerializeObject(updateKBDTO);
             foreach (var msg in qnaQueueMessage.Values)
             {
-                var blobPath = GetBlobPath(msg.FileUri, msg.FileName);
-                if (msg.FileName == blobPath)
+                var blobPath = GetBlobPath(msg.FileUri, log);
+                if (msg.FileName == blobPath || string.IsNullOrEmpty(blobPath))
                 {
                     continue;
                 }
@@ -357,11 +357,21 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
             return updateKB;
         }
 
-        private static string GetBlobPath(string fileUri, string fileName)
+        private static string GetBlobPath(string fileUri, ILogger log)
         {
-            int startIndex = fileUri.IndexOf(Constants.containerName) + Constants.containerName.Length + 1;
-            int endIndex = fileUri.IndexOf(fileName) + fileName.Length;
-            var blobPath = fileUri.Substring(startIndex, endIndex - startIndex);
+            var blobPath = string.Empty;
+            try
+            {
+                int startIndex = fileUri.IndexOf(Constants.containerName) + Constants.containerName.Length + 1;
+                int endIndex = fileUri.IndexOf("?sv=");
+                log.LogInformation("start: " + startIndex + " end: " + endIndex + " uri:" + fileUri);
+                blobPath = fileUri.Substring(startIndex, endIndex - startIndex);
+            }
+            catch(Exception e)
+            {
+                log.LogError(e.Message);
+            }
+
             return blobPath;
         }
 

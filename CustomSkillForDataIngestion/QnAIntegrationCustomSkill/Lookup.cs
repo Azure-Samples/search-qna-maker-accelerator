@@ -11,11 +11,9 @@ using Common;
 using Azure;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Models;
-using Azure.Storage.Blobs;
 using Azure.Storage;
 using Azure.Storage.Sas;
 using System.Net;
-using Microsoft.Azure.Storage.Auth;
 
 namespace QnAIntegrationCustomSkill
 {
@@ -52,14 +50,19 @@ namespace QnAIntegrationCustomSkill
             var response = await searchClient.GetDocumentAsync<SearchDocument>(id);
 
 
-            object metadata_storage_name;
-            response.Value.TryGetValue("metadata_storage_name", out metadata_storage_name);
+            object metadata_storage_path;
+            response.Value.TryGetValue("metadata_storage_path", out metadata_storage_path);
+            var storagePath = metadata_storage_path.ToString();
+            var startIndex = storagePath.IndexOf(Constants.containerName) + Constants.containerName.Length + 1;
+            var blobName = storagePath.Substring(startIndex);
+            blobName = Uri.UnescapeDataString(blobName);
+            log.LogInformation(blobName);
 
             var policy = new BlobSasBuilder
             {
                 Protocol = SasProtocol.HttpsAndHttp,
                 BlobContainerName = storageContainerName,
-                BlobName = metadata_storage_name.ToString(),
+                BlobName = blobName,
                 Resource = "b",
                 StartsOn = DateTimeOffset.UtcNow,
                 ExpiresOn = DateTimeOffset.UtcNow.AddHours(1),
