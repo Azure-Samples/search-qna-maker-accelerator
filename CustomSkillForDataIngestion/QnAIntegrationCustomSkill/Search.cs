@@ -77,7 +77,7 @@ namespace QnAIntegrationCustomSkill
                 }
                 catch (Exception e)
                 {
-                    log.LogInformation(e.ToString());
+                    log.LogInformation(e.Message);
                 }
         
             }
