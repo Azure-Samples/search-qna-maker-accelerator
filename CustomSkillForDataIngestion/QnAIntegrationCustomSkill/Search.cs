@@ -49,15 +49,6 @@ namespace QnAIntegrationCustomSkill
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-
-
-            //string q = req.Query["q"];
-            //string top = req.Query["top"];
-            //string skip = req.Query["skip"];
-            //string getAnswer = req.Query["getAnswer"];
-            //string filters = req.Query["filters"];
-
-
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             SearchRequest data = JsonConvert.DeserializeObject<SearchRequest>(requestBody);
 
@@ -66,20 +57,28 @@ namespace QnAIntegrationCustomSkill
             QnASearchResultList qnaResponse = null;
             if (data.getAnswer)
             {
-                kbId = await GetKbId(log);
-                qnaRuntimeKey = await GetRuntimeKey(log);
-                runtimeClient = new QnAMakerRuntimeClient(new EndpointKeyServiceClientCredentials(qnaRuntimeKey))
+                
+                try
                 {
-                    RuntimeEndpoint = qnaMakerEndpoint
-                };
+                    kbId = await GetKbId(log);
+                    qnaRuntimeKey = await GetRuntimeKey(log);
+                    runtimeClient = new QnAMakerRuntimeClient(new EndpointKeyServiceClientCredentials(qnaRuntimeKey))
+                    {
+                        RuntimeEndpoint = qnaMakerEndpoint
+                    };
 
-                var qnaOptions = new QueryDTO
+                    var qnaOptions = new QueryDTO
+                    {
+                        Question = data.q,
+                        Top = 1,
+                        ScoreThreshold = 30
+                    };
+                    qnaResponse = await runtimeClient.Runtime.GenerateAnswerAsync(kbId, qnaOptions);
+                }
+                catch (Exception e)
                 {
-                    Question = data.q,
-                    Top = 1,
-                    ScoreThreshold = 30
-                };
-                qnaResponse = await runtimeClient.Runtime.GenerateAnswerAsync(kbId, qnaOptions);
+                    log.LogInformation(e.Message);
+                }
         
             }
             

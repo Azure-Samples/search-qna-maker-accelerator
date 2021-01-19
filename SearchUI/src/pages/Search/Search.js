@@ -41,9 +41,9 @@ export default function Search(props) {
     };
 
     const headers = {
-      "x-functions-key": props.code
+        "x-functions-key": props.code
     };
-
+  
     const url = props.url + '/api/search';
     axios.post(url, body, {headers: headers})
       .then(response => {

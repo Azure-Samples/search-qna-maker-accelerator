@@ -82,6 +82,14 @@ export default function Upload(props) {
     </div>);
   }
 
+  var button;
+  if (file !== "") {
+    button = (<button className="btn btn-primary rounded-0" onClick={onUploadClick}>Upload Document</button>);
+  } else {
+    button = (<button className="btn btn-primary rounded-0" disabled>Upload Document</button>);
+  }
+
+
   return (
     <main className="main main--upload">
       <div>
@@ -100,7 +108,7 @@ export default function Upload(props) {
 
       </div>
       <br />
-      <button className="btn btn-primary rounded-0" onClick={onUploadClick}>Upload Document</button>
+      {button}
       {loading}
       <br />
       <br />
