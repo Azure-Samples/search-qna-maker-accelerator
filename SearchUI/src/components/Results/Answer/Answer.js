@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import ReactHtmlParser from 'react-html-parser';
 
 import './Answer.css';
 
@@ -40,9 +39,7 @@ export default function Answer(props) {
                     </div>
                 </a>
                 <p style={uriStyle}>{props.data.document.document.metadata_storage_path}</p>
-                <p style={pStyle}>
-                    {ReactHtmlParser(props?.data.document.highlights?.content[0] || "")}
-                </p>
+                <p></p>
             </div>
         </div>
     );
