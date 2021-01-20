@@ -126,7 +126,7 @@ namespace QnAIntegrationCustomSkill
                 output.answers = new QnAResult();
                 output.answers.answer = qnaResponse.Answers.First();
                 var source = output.answers.answer.Source;
-                output.answers.document = await GetDocument(source, output.results);
+                output.answers.document = await GetDocument(source, output.results, log);
             }
 
             return new OkObjectResult(output);
@@ -246,20 +246,22 @@ namespace QnAIntegrationCustomSkill
             return runtimeKey;
         }
 
-        private static async Task<SearchResult<SearchDocument>> GetDocument(string source, List<SearchResult<SearchDocument>> searchResult)
+        private static async Task<SearchResult<SearchDocument>> GetDocument(string source, List<SearchResult<SearchDocument>> searchResult, ILogger log)
         {
             if (source == null)
             {
                 return null;
             }
-
+            
             var blobURL = string.Concat(blobBaseURL, source);
+            log.LogInformation(blobURL);
             // check if source present in search results 
             foreach (var doc in searchResult)
             {
                 object name;
                 if (doc.Document.TryGetValue("metadata_storage_path", out name) && name.ToString() == blobURL)
                 {
+                    log.LogInformation("blob path constructed: " + blobURL + " blob path in index: " + name.ToString());
                     return doc;
                 }
             }
@@ -267,7 +269,7 @@ namespace QnAIntegrationCustomSkill
             // else query search index
             SearchOptions options = new SearchOptions();
             options.SearchFields.Add("metadata_storage_path");
-            var result = await searchClient.SearchAsync<SearchDocument>(blobURL, options);
+            var result = await searchClient.SearchAsync<SearchDocument>("\""+blobURL+"\"", options);
             return result.Value.GetResults().ToList().First();
         }
     }
