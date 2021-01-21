@@ -7,7 +7,8 @@ import './Answer.css';
 export default function Answer(props) {
 
     const bodyStyle = {
-        padding: '0.25rem'
+        padding: '0.25rem',
+        overflowWrap: 'normal'
     };
 
     const pStyle = {
@@ -27,7 +28,7 @@ export default function Answer(props) {
     };
 
     return (
-        <div className="card answer row" >
+        <div className="card answer" >
             <div className="card-body" style={bodyStyle}>
                 <h6 className="title-style">{props.data.answer.questions[0]}</h6>
                 <p>
