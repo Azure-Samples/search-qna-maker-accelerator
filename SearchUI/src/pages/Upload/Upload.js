@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { useState } from "react";
 import axios from 'axios';
 import CircularProgress from '@material-ui/core/CircularProgress';

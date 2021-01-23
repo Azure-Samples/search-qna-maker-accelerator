@@ -1,4 +1,7 @@
-﻿namespace Common
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+namespace Common
 {
     public class Constants
     {

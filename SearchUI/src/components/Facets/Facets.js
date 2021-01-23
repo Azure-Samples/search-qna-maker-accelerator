@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React from 'react';
 import { List, Chip } from '@material-ui/core';
 import CheckboxFacet from './CheckboxFacet/CheckboxFacet';

@@ -1,5 +1,5 @@
     MIT License
-
+    Cognitive Search Question Answering Solution Accelerator
     Copyright (c) Microsoft Corporation.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
