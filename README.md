@@ -90,3 +90,8 @@ The UI is a React-based Web App available in the `SearchUI` folder. Navigate to 
 ## Resources
 + [Cognitive Search Documentation](https://docs.microsoft.com/azure/search/)
 + [QnA Maker Documentation](https://docs.microsoft.com/azure/cognitive-services/QnAMaker/)
+
+## Legal
++ [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
++ [Trademark notice](https://docs.opensource.microsoft.com/content/releasing/index.html)
++ [Security reporting instructions](https://docs.opensource.microsoft.com/content/releasing/security.html)

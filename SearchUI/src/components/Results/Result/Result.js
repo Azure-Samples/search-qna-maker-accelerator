@@ -1,9 +1,10 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React from 'react'
 import ReactHtmlParser from 'react-html-parser';
 
-
 import './Result.css';
-
 
 export default function Result(props) {
 
@@ -18,7 +19,6 @@ export default function Result(props) {
         marginBottom: '0'
     };
     
-
     const pStyle = {
         paddingLeft: '0.25rem',
         fontSize: '0.9rem'
