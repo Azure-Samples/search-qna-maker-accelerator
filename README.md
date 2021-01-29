@@ -1,6 +1,6 @@
 # Cognitive Search Question Answering Solution Accelerator
 
-An integrated search solution leveraging [Azure Cognitive Search](https://azure.microsoft.com/services/search/) and [QnA Maker](https://www.qnamaker.ai/) to provide instant answers to common questions.
+An integrated search solution leveraging [Azure Cognitive Search](https://azure.microsoft.com/services/search/) and [QnA Maker](https://www.qnamaker.ai/) to provide instant answers to common questions. Learn more about the repo in this [blog post](https://techcommunity.microsoft.com/t5/azure-ai/qna-with-azure-cognitive-search/ba-p/2081381).
 
 ![Screenshot of sample web app](./images/web-app.png)
 
@@ -86,6 +86,10 @@ ___
 
 The UI is a React-based Web App available in the `SearchUI` folder. Navigate to [**SearchUI/README.md**](SearchUI/README.md) for more details on the web app. 
 
+
+## Disclaimer
+
+This repo has been tested with document sets as big as 2,000 documents. If you have a larger dataset or run into any issues with this repo, please open an [issue](https://github.com/Azure-Samples/search-qna-maker-accelerator/issues) and we will get back with you.
 
 ## Resources
 + [Cognitive Search Documentation](https://docs.microsoft.com/azure/search/)
