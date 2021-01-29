@@ -89,7 +89,7 @@ The UI is a React-based Web App available in the `SearchUI` folder. Navigate to 
 
 ## Discliamer
 
-This repo has been tested with document sets as big as 2,000 documents. If you have a larger dataset or run into any issues with this repo, please open an [issue](https://github.com/Azure-Samples/search-qna-maker-accelerator/issues) and we will get back you you.
+This repo has been tested with document sets as big as 2,000 documents. If you have a larger dataset or run into any issues with this repo, please open an [issue](https://github.com/Azure-Samples/search-qna-maker-accelerator/issues) and we will get back you.
 
 ## Resources
 + [Cognitive Search Documentation](https://docs.microsoft.com/azure/search/)
