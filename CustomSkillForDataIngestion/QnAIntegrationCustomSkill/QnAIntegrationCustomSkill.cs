@@ -147,8 +147,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 new Uri($"https://{GetAppSetting("SearchServiceName")}.search.windows.net"),
                 Constants.indexName,
                 new Azure.AzureKeyCredential(GetAppSetting("SearchServiceApiKey")));
-            // TODO check to make sure this already exists in the index i.e. the indexer has finished indexed this id
-            // so that the indexer doesn't overwrite this status with the InQueue status (avoid race condition with indexer)
+
             await searchClient.MergeOrUploadDocumentsAsync(indexDocuments);
 
             await qnaClient.Knowledgebase.PublishAsync(kbId);
@@ -169,7 +168,6 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 BlobServiceClient blobServiceClient = new BlobServiceClient(GetAppSetting("AzureWebJobsStorage"));
                 BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(Constants.kbContainerName);
                 BlobClient kbidBlobClient = containerClient.GetBlobClient(Constants.kbIdBlobName);
-                EndpointKeysDTO endpointKey = null;
                 // Check blob for kbid 
                 if (await kbidBlobClient.ExistsAsync())
                 {
@@ -184,20 +182,14 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
                 }
                 else
                 {
-                    BlobClient keyBlobClient = containerClient.GetBlobClient(Constants.keyBlobName);
                     kbId = await CreateKB(qnaClient, log);
-                    endpointKey = await qnaClient.EndpointKeys.GetKeysAsync();
-                    // save kbid and qnamaker runtime key to blob
+
+                    // save kbid to blob
                     await UploadToBlob(kbidBlobClient, kbId);
-                    await UploadToBlob(keyBlobClient, endpointKey.PrimaryEndpointKey);
                 }
                 // save kbid to local file system 
                 Directory.CreateDirectory(path);
                 File.WriteAllText(filePath, kbId);
-
-                // save qna runtime key to local file system 
-                var keyFilePath = Path.Join(path, Constants.keyBlobName + ".txt");
-                File.WriteAllText(keyFilePath, endpointKey.PrimaryEndpointKey);
             }
             return kbId;
         }
@@ -216,6 +208,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
         private static async Task<string> CreateKB(QnAMakerClient qnaClient, ILogger log)
         {
+            await Task.Delay(5000);
             var createKbDTO = new CreateKbDTO { Name = "search", Language = "English" };
             var operation = await qnaClient.Knowledgebase.CreateAsync(createKbDTO);
             operation = await MonitorOperation(qnaClient, operation, log);
@@ -226,7 +219,7 @@ namespace AzureCognitiveSearch.QnAIntegrationCustomSkill
 
         private static async Task<Operation> UpdateKB(QnAMakerClient qnaClient, string updateKB, string kbId, ILogger log)
         {
-            var service = "/qnamaker/v4.0";
+            var service = "/qnamaker/v5.0-preview.1";
             string uri = qnaClient.Endpoint + service + "/knowledgebases/" + kbId;
 
             // Starts the QnA Maker operation to update the knowledge base

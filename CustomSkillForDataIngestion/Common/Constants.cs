@@ -21,8 +21,6 @@ namespace Common
 
         public const string kbIdBlobName = "kbid";
 
-        public const string keyBlobName = "runtimekey";
-
         public const string apiVersion = "2020-06-30";
 
         public const int MaxTextFileSizeInMb = 10;
