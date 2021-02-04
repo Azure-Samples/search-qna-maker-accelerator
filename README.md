@@ -38,12 +38,12 @@ You can view a live demo of this repo at the following link:
 
 The services and components needed for the solution are packaged in the repo's [ARM template](./azuredeploy.json). Click the **Deploy to Azure** button to get started:
 
-[![Deploy to Azure using QnA Maker V2](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fsearch-qna-maker-accelerator%2FQnAMakerV2PublicPreview%2Fazuredeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fsearch-qna-maker-accelerator%2FQnAMakerV2PublicPreview%2Fazuredeploy.json)
 
 The following resources will be deployed:
 
 1. Azure Cognitive Search
-2. QnA Maker Cognitive Service (this will always be deployed to the West US region, but your data is not stored here - see [here](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/concepts/azure-resources?tabs=v1#management-service-region))
+2. QnA Maker Managed Cognitive Service (this will always be deployed to the West US region, but your data is not stored here - see [here](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/concepts/azure-resources?tabs=v1#management-service-region))
 3. Azure App Service, App Service Plan
 4. Azure App Service, Website to host the UI
 5. Storage Account
