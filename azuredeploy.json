@@ -71,7 +71,7 @@
             ],
             "type": "String",
             "metadata": {
-                "description": "QnA Maker Managed resource location"
+                "description": "QnA Maker Managed resource location. This can be different from the region of the resource group."
             }
         }
     },
