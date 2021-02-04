@@ -40,7 +40,7 @@ The services and components needed for the solution are packaged in the repo's [
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fsearch-qna-maker-accelerator%2Fmain%2Fazuredeploy.json)
 
-To deploy the solution using QnA Maker Managed which is currently in Public Preview click the below **Deploy to Azure** button:
+If you want to use the latest version of QnA Maker: [QnA Maker managed](https://techcommunity.microsoft.com/t5/azure-ai/introducing-qna-maker-managed-now-in-public-preview/ba-p/1845575) (currently in public preview), click the **Deploy to Azure** button given below
 
 [![Deploy to Azure QnA Maker Managed](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fsearch-qna-maker-accelerator%2FQnAMakerV2PublicPreview%2Fazuredeploy.json)
 
