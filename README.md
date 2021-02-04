@@ -40,6 +40,10 @@ The services and components needed for the solution are packaged in the repo's [
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fsearch-qna-maker-accelerator%2Fmain%2Fazuredeploy.json)
 
+To deploy the solution using QnA Maker Managed which is currently in Public Preview click the below **Deploy to Azure** button:
+
+[![Deploy to Azure QnA Maker Managed](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fsearch-qna-maker-accelerator%2FQnAMakerV2PublicPreview%2Fazuredeploy.json)
+
 The following resources will be deployed:
 
 1. Azure Cognitive Search
@@ -50,6 +54,7 @@ The following resources will be deployed:
 6. Storage Account
 7. Azure Function App
 8. Cognitive Services All-in-one resource
+9. Application Insights
 
 The deployment may take several minutes. Once the deployment finishes, navigate over to the **Outputs** tab:
 
