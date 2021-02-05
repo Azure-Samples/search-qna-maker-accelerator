@@ -10,7 +10,7 @@ This solution accelerator leverages the power of Azure Cognitive Search together
 
 Ordinarily, Azure Cognitive Search returns the most relevant documents for your search query but together with QnA Maker integration, it can not only find the most relevant documents but also pull questions and answers out of the document and suggest the most relevant answers.  During Cognitive Search data ingestion, a custom skill sends the document to QnA Maker for processing. 
 
- The latest version of QnA Maker: [QnA Maker Managed](https://techcommunity.microsoft.com/t5/azure-ai/introducing-qna-maker-managed-now-in-public-preview/ba-p/1845575) which is currently in public preview includes features such as [short answer extraction](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/reference-precise-answering) to name a few.
+ This branch uses the latest version of QnA Maker: [QnA Maker Managed](https://techcommunity.microsoft.com/t5/azure-ai/introducing-qna-maker-managed-now-in-public-preview/ba-p/1845575) which is currently in public preview. It includes new features such as [precise answering](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/reference-precise-answering) to name a few.
 
 Please note that not all documents support the [question/answer format required by QnA Maker](https://docs.microsoft.com/azure/cognitive-services/qnamaker/concepts/data-sources-and-content#file-and-url-data-types).  By default, the logic in the Search service indexer also ingests only the following file types: `.pdf,.docx,.doc,.xlsx,.xls,.html,.rtf,.txt,.tsv`.  You can change this by modifying the `indexedFileNameExtensions` property in the [Indexer.json](./CustomSkillForDataIngestion/QnAIntegrationCustomSkill/Assets/Indexer.json).  
 
