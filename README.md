@@ -1,6 +1,6 @@
 # Cognitive Search Question Answering Solution Accelerator
 
-An integrated search solution leveraging [Azure Cognitive Search](https://azure.microsoft.com/services/search/) and [QnA Maker Managed](https://www.qnamaker.ai/) to provide instant answers to common questions. Learn more about the repo in this [blog post](https://techcommunity.microsoft.com/t5/azure-ai/qna-with-azure-cognitive-search/ba-p/2081381).
+An integrated search solution leveraging [Azure Cognitive Search](https://azure.microsoft.com/services/search/) and [QnA Maker](https://www.qnamaker.ai/) to provide instant answers to common questions. Learn more about the repo in this [blog post](https://techcommunity.microsoft.com/t5/azure-ai/qna-with-azure-cognitive-search/ba-p/2081381).
 
 ![Screenshot of sample web app](./images/web-app.png)
 
@@ -9,6 +9,8 @@ An integrated search solution leveraging [Azure Cognitive Search](https://azure.
 This solution accelerator leverages the power of Azure Cognitive Search together with QnA Maker to find answers to your questions in a similar way to how Bing and Google suggest relevant answers to queries.  
 
 Ordinarily, Azure Cognitive Search returns the most relevant documents for your search query but together with QnA Maker integration, it can not only find the most relevant documents but also pull questions and answers out of the document and suggest the most relevant answers.  During Cognitive Search data ingestion, a custom skill sends the document to QnA Maker for processing. 
+
+ The latest version of QnA Maker: [QnA Maker Managed](https://techcommunity.microsoft.com/t5/azure-ai/introducing-qna-maker-managed-now-in-public-preview/ba-p/1845575) which is currently in public preview includes features such as [short answer extraction](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/reference-precise-answering) to name a few.
 
 Please note that not all documents support the [question/answer format required by QnA Maker](https://docs.microsoft.com/azure/cognitive-services/qnamaker/concepts/data-sources-and-content#file-and-url-data-types).  By default, the logic in the Search service indexer also ingests only the following file types: `.pdf,.docx,.doc,.xlsx,.xls,.html,.rtf,.txt,.tsv`.  You can change this by modifying the `indexedFileNameExtensions` property in the [Indexer.json](./CustomSkillForDataIngestion/QnAIntegrationCustomSkill/Assets/Indexer.json).  
 
@@ -36,9 +38,9 @@ You can view a live demo of this repo at the following link:
 
 ### 1. Deploy Resources
 
-The services and components needed for the solution are packaged in the repo's [ARM template](./azuredeploy.json). Click the **Deploy to Azure** button to get started:
+The services and components needed for the solution are packaged in the repo's [ARM template](./azuredeploy.json). Click the **Deploy to Azure** button, to get started:
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fsearch-qna-maker-accelerator%2FQnAMakerV2PublicPreview%2Fazuredeploy.json)
+[![Deploy to Azure QnA Maker Managed](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fsearch-qna-maker-accelerator%2FQnAMakerV2PublicPreview%2Fazuredeploy.json)
 
 The following resources will be deployed:
 
