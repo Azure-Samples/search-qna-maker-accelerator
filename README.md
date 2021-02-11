@@ -70,6 +70,8 @@ Open up a new browser tab and paste the URL into the browser. This will run for 
 
 Navigate to the storage account in the resource group you just created. Find the container named `qna-container` and upload your documents into the container. 
 
+Sample documents are available in the [SampleDocuments](./SampleDocuments) folder.
+
 ___
 > NOTE: if you would prefer to pull data from a different, pre-existing blob storage account, you may instead change the data source in your Search service to point to a container in a different blob storage account.  Just change the connection string and container name in the data source in the Search service.  
 ___
