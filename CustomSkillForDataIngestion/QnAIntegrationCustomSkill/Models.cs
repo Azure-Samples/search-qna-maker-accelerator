@@ -1,4 +1,7 @@
-﻿using Azure.Search.Documents.Models;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+using Azure.Search.Documents.Models;
 using Microsoft.Azure.CognitiveServices.Knowledge.QnAMaker.Models;
 using Microsoft.Azure.Documents;
 using System;

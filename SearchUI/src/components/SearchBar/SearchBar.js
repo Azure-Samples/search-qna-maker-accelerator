@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import Suggestions from './Suggestions/Suggestions';

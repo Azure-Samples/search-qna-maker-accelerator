@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 var http = require('http');
 var server = http.createServer((request, response) => {
 
