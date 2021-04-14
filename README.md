@@ -40,14 +40,14 @@ The services and components needed for the solution are packaged in the repo's [
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fsearch-qna-maker-accelerator%2Fmain%2Fazuredeploy.json)
 
-If you want to use the latest version of QnA Maker: [QnA Maker managed](https://techcommunity.microsoft.com/t5/azure-ai/introducing-qna-maker-managed-now-in-public-preview/ba-p/1845575) (currently in public preview) which includes new features such as [precise answering](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/reference-precise-answering), click the **Deploy to Azure** button given below:
+If you want to use the latest version of QnA Maker: [QnA Maker managed](https://techcommunity.microsoft.com/t5/azure-ai/introducing-qna-maker-managed-now-in-public-preview/ba-p/1845575) (currently in public preview) which includes new features such as [precise answering](https://docs.microsoft.com/azure/cognitive-services/qnamaker/reference-precise-answering), click the **Deploy to Azure** button given below:
 
 [![Deploy to Azure QnA Maker Managed](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fsearch-qna-maker-accelerator%2FQnAMakerV2PublicPreview%2Fazuredeploy.json)
 
 The following resources will be deployed:
 
 1. Azure Cognitive Search
-2. QnA Maker Cognitive Service (this will always be deployed to the West US region, but your data is not stored here - see [here](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/concepts/azure-resources?tabs=v1#management-service-region))
+2. QnA Maker Cognitive Service (this will always be deployed to the West US region, but your data is not stored here - see [here](https://docs.microsoft.com/azure/cognitive-services/qnamaker/concepts/azure-resources?tabs=v1#management-service-region))
 3. Azure App Service, App Service Plan
 4. Azure App Service, Website for Qna Maker
 5. Azure App Service, Website to host the UI
@@ -88,14 +88,27 @@ As part of the ARM template, a UI is deployed to `https://{prefix}-ui-{randomStr
 ![Screenshot of sample web app](./images/search-results.png)
 
 ___
-> NOTE: At this point, you should consider [adding authentication to the web app in the Azure portal](https://docs.microsoft.com/en-us/azure/app-service/scenario-secure-app-authentication-app-service) to secure your data.
+> NOTE: At this point, you should consider [adding authentication to the web app in the Azure portal](https://docs.microsoft.com/azure/app-service/scenario-secure-app-authentication-app-service) to secure your data.
 ___
 
 The UI is a React-based Web App available in the `SearchUI` folder. Navigate to [**SearchUI/README.md**](SearchUI/README.md) for more details on the web app. 
 
+## Frequently Asked Questions (FAQ)
+**How is this solution utilizing QnaMaker different from the [new semantic search functionality](https://docs.microsoft.com/azure/search/semantic-search-overview) in Cognitive Search?**
+
+The semantic search question answering does have a functional overlap with this solution accelerator using QnA Maker.  Here's what you need to know.  
++ The QnA extracted by QnA Maker in this solution accelerator are high precision. Also, these QnAs can be edited in the qnamaker.ai portal. 
++ The QnAs provided by the semantic search feature are high recall.  These are extracted at runtime and non-customizable.
+
+However, the two options are not mutually exclusive and can be used together.  The recommendation to customers is to use the QnA Maker solution for the head queries (high precision, curated), and fallback to the semantic search QnA when there is no good match in QnA Maker.  Specifically:
++ Using the accelerator solution, both the QnA Maker and Semantic answer are available simultaneously.
++ Set an appropriate threshold for the QnA Maker Answer. 
++ If QnA Maker returns the answer, show that in the final result (ignoring the Semantic Search answer).
++ If not, show the Semantic Search answer if available.
++ This will need code changes in the final merging logic of the results.
+
 
 ## Disclaimer
-
 This repo has been tested with document sets as big as 2,000 documents. If you have a larger dataset or run into any issues with this repo, please open an [issue](https://github.com/Azure-Samples/search-qna-maker-accelerator/issues) and we will get back to you.
 
 ## Resources
