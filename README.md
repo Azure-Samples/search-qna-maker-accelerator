@@ -97,8 +97,8 @@ The UI is a React-based Web App available in the `SearchUI` folder. Navigate to 
 **How is this solution utilizing QnaMaker different from the [new semantic search functionality](https://docs.microsoft.com/azure/search/semantic-search-overview) in Cognitive Search?**
 
 The semantic search question answering does have a functional overlap with this solution accelerator using QnA Maker.  Here's what you need to know.  
-+ The QnA extracted by QnA Maker in this solution accelerator are high precision. Also, these QnAs can be edited in the qnamaker.ai portal. 
-+ The QnAs provided by the semantic search feature are high recall.  These are extracted at runtime and non-customizable.
++ The QnA extracted by QnA Maker in this solution accelerator are high precision. This means that this type of QnA is valuable for scenarios where there's a set of questions users frequently ask and you want to be able to provide a precise answer. These QnAs can also be edited in the qnamaker.ai portal, giving you full control over the answers.
++ The QnAs provided by the semantic search feature are high recall. This gives you the ability to get meaningful answers to much more specific questions. These are extracted at runtime and non-customizable.
 
 However, the two options are not mutually exclusive and can be used together.  The recommendation to customers is to use the QnA Maker solution for the head queries (high precision, curated), and fallback to the semantic search QnA when there is no good match in QnA Maker.  Specifically:
 + Using the accelerator solution, both the QnA Maker and Semantic answer are available simultaneously.
